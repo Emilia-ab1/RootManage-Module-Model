@@ -2,7 +2,7 @@
 id=UniCron
 name=UniCron
 version=debug
-versionCode=20241026
+versionCode=20241211
 author=SherlockChiang&LIghtJUNction
 description=前置依赖模块，用于统一管理定时运行的任务
 updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniCron/update.json
