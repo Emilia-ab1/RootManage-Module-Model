@@ -97,7 +97,6 @@ mihomo_prepare() {
         exit 1
     else
         log INFO "加载配置文件: ${mihomo_config}"
-        
         # 循环提取URL并进行判断
         while true; do
             extracted_url=$(extract_sub_url)
@@ -117,7 +116,6 @@ mihomo_prepare() {
     fi
     log INFO "备份链接"
     echo "url=$extracted_url" > $ENV_FILE
-    
 }
 
 mihomo_run() {
@@ -132,5 +130,4 @@ mihomo_run() {
         log Error "未找到或不可执行的 ${mihomo}"
         exit 1
     fi
-
 }
