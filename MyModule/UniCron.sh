@@ -1,5 +1,5 @@
 MODDIR=${0%/*}
-source $MODDIR/tools # 导入工具函数
+source $MODDIR/tools.sh # 导入工具函数
 # 本内置项目1分钟检查一次
 # for循环读取data/adb/modules/里面的每一个模块，除了(UniCron本身)。如果有Unicron文件夹，则提取里面后缀为.cron的文件创建一个符号链接到$MODDIR/API/cron_tasks/
 
