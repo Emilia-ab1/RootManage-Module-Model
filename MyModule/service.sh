@@ -1,60 +1,49 @@
-#这个脚本将会在 late_start 服务模式下运行
-# 获取模块的基本目录路径
+#!/system/bin/sh
 MODDIR=${0%/*}
 
-# 在此处编写您的服务脚本逻辑
-# 例如，您可以在此处添加需要在 late_start 服务模式下运行的命令
+CRONDIR="$MODDIR/cron"
+CRONTAB_DIR="$CRONDIR/crontabs"
+LOG_FILE="$MODDIR/Cron.log"
 
-# 示例：打印一条消息到日志
-echo "服务脚本已启动" >> /data/local/tmp/service.log
+crond(){
+    busybox crond -b -c "$CRONTAB_DIR"
+}
+crontab(){
+    busybox crontab -b -c "$CRONTAB_DIR"
+}
 
-# 示例：设置系统属性
-resetprop ro.example.property "example_value"
+# 合并函数：合并所有模块的定时任务到 crontab
+merge_crontabs(){
+    CRONTAB_FILE="$CRONTAB_DIR/root"
+    # 清空旧的 crontab 文件
+    : > "$CRONTAB_FILE"
+    # 合并所有任务
+    for task in $TASKS_DIR/*; do
+        if [ -f "$task" ]; then
+            cat "$task" >> "$CRONTAB_FILE"
+            echo "" >> "$CRONTAB_FILE"
+        fi
+    done
+}
 
-# 示例：启动一个后台服务
-nohup some_background_service &
+log() {
+    [ ! -f "${LOG_FILE}" ] && touch "${LOG_FILE}"
+    case $1 in
+        INFO) color="${blue}" ;;
+        Error) color="${red}" ;;
+        Warning) color="${yellow}" ;;
+        *) color="${green}" ;;
+    esac
+    current_time=$(formatted_date)
+    message="${current_time} [$1]: $2"
+    if [ -t 1 ]; then
+        echo -e "${color}${message}${normal}"
+    else
+        echo "${message}" >> "${LOG_FILE}" 2>&1
+    fi
+}
 
-# 示例：执行一个耗时的任务 sleep 10等待10秒
-sleep 10
+merge_crontabs
+crond
 
-# 示例：打印一条消息到日志
-echo "服务脚本已完成" >> /data/local/tmp/service.log
-
-# 请注意：
-# - 避免使用可能阻塞或显著延迟启动过程的命令。
-# - 确保此脚本启动的任何后台任务都得到妥善管理，以避免资源泄漏。
-
-# 有关更多信息，请参阅 KernelSU 文档中的启动脚本部分。
-
-# 示例：检查设备的架构并执行相应的操作
-if [ "$(uname -m)" = "aarch64" ]; then
-    echo "设备架构为 arm64" >> /data/local/tmp/service.log
-    # 在此处添加针对 arm64 架构的命令
-else
-    echo "设备架构为其他" >> /data/local/tmp/service.log
-    # 在此处添加针对其他架构的命令
-fi
-
-# 示例：检查某个文件是否存在
-if [ -f /data/local/tmp/some_file ]; then
-    echo "文件存在" >> /data/local/tmp/service.log
-    # 在此处添加文件存在时的处理逻辑
-else
-    echo "文件不存在" >> /data/local/tmp/service.log
-    # 在此处添加文件不存在时的处理逻辑
-fi
-
-# 示例：设置权限
-chmod 644 /data/local/tmp/service.log
-
-# 示例：创建一个目录
-mkdir -p /data/local/tmp/my_service_dir
-
-# 示例：写入环境变量到文件
-echo "MY_ENV_VAR=my_value" > /data/local/tmp/my_service_dir/env_vars
-
-# 示例：启动另一个脚本
-sh /data/local/tmp/my_service_dir/another_script.sh & Compare this snippet from MyModule/service.sh: # 这个脚本将在服务模式下运行
-
-
-
+log DEBUG "测试"
