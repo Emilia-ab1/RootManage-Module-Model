@@ -17,3 +17,5 @@
 总之方法千千万，你只要放到UniCron/xxx.cron里面，我的前置模块就能读取并添加到列表中
 
 不建议直接echo "cron语句" > data/adb/modules/UniCron/API/cron_tasks/模块名.cron里，你不打算移除了就这样写
+
+请去images文件夹查看图片

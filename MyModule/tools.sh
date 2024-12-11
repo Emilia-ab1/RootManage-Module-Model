@@ -6,6 +6,7 @@ TASKS_DIR="$MODDIR/API/cron_tasks"
 TMP_FILE="$API_DIR/tmp.cron"
 CRON_TASKS_DIR="$MODDIR/API/cron_tasks"
 MODULES_DIR="/data/adb/modules"
+LOG_FILE="$MODDIR/UniCron.log"
 
 # 颜色定义
 red='\033[0;31m'
