@@ -1,1 +1,2 @@
-* * * * * /data/adb/modules/UniCron/service
+* * * * * /data/adb/modules/UniCron/UniCron.sh
+* 6 * * * /data/adb/modules/UniCron/logCleaner.sh
