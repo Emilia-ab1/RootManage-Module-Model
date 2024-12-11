@@ -1,6 +1,6 @@
 id=UniCron
 name=UniCron
-version=debug
+version=UniCron-0.0.1
 versionCode=20241211
 author=SherlockChiang&LIghtJUNction
 description=前置依赖模块，用于统一管理定时运行的任务
