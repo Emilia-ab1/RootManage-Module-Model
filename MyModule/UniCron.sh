@@ -10,14 +10,16 @@ for module in "$MODULES_DIR"/*; do
         continue
     fi
 
-    if [ -d "$module/UniCron" ]; then
-        log INFO "发现UniCron文件夹: $module/UniCron"
-
+    if [ -d "$module/UniCron" ];   then
         # 检查done文件
-        if [ -f "$module/UniCron/done" ]; then
+        if [ -f "$module/UniCron/done" -o -f "$module/UniCron/null" ]; then
             continue
+        
         else
+            log INFO "发现UniCron文件夹: $module/UniCron"
+            
             # 提取后缀为.cron的文件并创建符号链接
+            count=0
             for cron_file in "$module/UniCron"/*.cron; do
                 if [ -f "$cron_file" ]; then
                     target_link="$CRON_TASKS_DIR/$(basename "$cron_file")"
@@ -29,17 +31,22 @@ for module in "$MODULES_DIR"/*; do
                     fi
                 fi
             done
-            touch "$module/UniCron/done"
-            log INFO "成功注册模块！: $module"
+            # 如果至少有一个符号链接被创建
+            if ((count > 0)); then
+                touch "$module/UniCron/done"
+                log INFO "成功注册模块！: $module，数量：$count"
+            else
+                log ERROR "$module/UniCron/为空，是不是忘记了？"
+            fi
         fi
 
     else
         if [ -f "$module/UniCron/null" ]; then
             continue
         else
+            mkdir "${module}/UniCron/"
+            touch "${module}/UniCron/null"
             log INFO "$module模块未适配!"
-            mkdir $mudule/UniCron/""
-            touch "$module/UniCron/null"
         fi
     fi
 done
