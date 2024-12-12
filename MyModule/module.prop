@@ -3,5 +3,5 @@ name=UniCron
 version=UniCron-1.0
 versionCode=20241212
 author=LIghtJUNction
-description=每分钟执行 ：test.sh  每分钟执行 ：UniCron.sh  每分钟执行 每天6点执行 ：logCleaner.sh  
+description=
 updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniCron/update.json
