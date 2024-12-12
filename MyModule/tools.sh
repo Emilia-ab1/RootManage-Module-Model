@@ -72,7 +72,7 @@ crontab(){
     fi
 }
 
-cheak(){
+check(){
     busybox crontab -c "$CRONTAB_DIR" -l  # 检查
 }
 
