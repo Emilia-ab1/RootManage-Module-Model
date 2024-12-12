@@ -29,6 +29,8 @@ set_module_description(){
     sed -i "s/^description=.*/description=$(printf '%s' "${new_description//\//\\/}")/" "${MODULE_PROP}"
 }
 
+
+
 formatted_date() {
     date +"%Y-%m-%d %H:%M:%S.%3N"
 }
@@ -103,3 +105,7 @@ mihomo_run() {
         exit 1
     fi
 }
+
+
+
+
