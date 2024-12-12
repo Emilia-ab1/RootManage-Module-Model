@@ -1,7 +1,6 @@
-# Changelog 1.0
-版本介绍
-1.0 -- 使用 magisk/apatch/kernelsu内置busybox的applet：crond/crontab工具
 
-优点
-使用简单
-仅需在你的模块根目录下放UniCron/moduleid.cron即可被本模块收集 并统一管理(更新/移除/禁用)
+# Changelog 0.0.0
+
+1. 恭喜你成功创建了一个 KernelSU/Aptch/Magisk 模块项目
+2. 这是一个示例
+

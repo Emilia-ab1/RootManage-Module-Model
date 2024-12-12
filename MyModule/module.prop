@@ -1,7 +1,7 @@
-id=UniCron
-name=UniCron
+id=UniTimecron
+name=UniTimecron
 version=0.0.0
 versionCode=20241212
 author=LIghtJUNction
-description=前置模块，提供统一的定时脚本服务
-updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniCron/update.json
+description=timecron+ksu/webui = UniTimecron，默认密码admin
+updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniTimecron/update.json
