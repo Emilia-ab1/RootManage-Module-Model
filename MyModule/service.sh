@@ -17,4 +17,5 @@ sleep 3
 
 log INFO "开机运行"
 $MODDIR/UniCron.sh
+crontabs 1
 crond 1
