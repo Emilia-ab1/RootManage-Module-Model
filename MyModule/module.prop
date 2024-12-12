@@ -1,6 +1,6 @@
 id=UniCron
 name=UniCron
-version=UniCron-0.0.1
+version=UniCron-1.0
 versionCode=20241212
 author=LIghtJUNction
 description=每分钟执行 ：test.sh  每分钟执行 ：UniCron.sh  每分钟执行 每天6点执行 ：logCleaner.sh  
