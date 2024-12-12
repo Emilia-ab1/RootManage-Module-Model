@@ -3,5 +3,5 @@ name=UniCron
 version=UniCron-1.0
 versionCode=20241212
 author=LIghtJUNction
-description=
+description=前置模块，提供统一的定时脚本服务
 updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniCron/update.json
