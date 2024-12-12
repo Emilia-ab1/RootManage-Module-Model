@@ -111,7 +111,7 @@ while true ; do
   fi
 done
 
-
+set_perm_recursive $MODPATH 0 0 0755 0755
 
 ui_print "感谢使用！关注我的公众号/加入我的qq群/关注我的酷安号：LIghtJUNction/以获取支持!"
 
