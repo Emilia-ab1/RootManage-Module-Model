@@ -1,1 +1,9 @@
-2024-12-12 04:27:50.535 [INFO]: 文件内容不一致，执行备份：/storage/emulated/0/临时文件夹/UniCron/API/tmp.cron -> /storage/emulated/0/临时文件夹/UniCron/API/bak.cron
+2024-12-12 15:39:52.361 [INFO]: 开机运行
+2024-12-12 15:39:52.376 [INFO]: 杀死crond
+2024-12-12 15:39:52.442 [INFO]: crond运行
+2024-12-12 15:40:34.886 [INFO]: 发现UniCron文件夹: /data/adb/modules/MagicNet/UniCron
+2024-12-12 15:40:34.913 [INFO]: 无需删除done来更新，符号链接时刻最新
+2024-12-12 15:40:34.940 [INFO]: 成功注册模块！: /data/adb/modules/MagicNet，数量：1
+2024-12-12 15:41:15.682 [INFO]: 发现UniCron文件夹: /data/adb/modules/MagicNet/UniCron
+2024-12-12 15:41:15.710 [INFO]: 无需删除done来更新，符号链接时刻最新
+2024-12-12 15:41:15.743 [INFO]: 成功注册模块！: /data/adb/modules/MagicNet，数量：1
