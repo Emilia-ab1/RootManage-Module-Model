@@ -20,3 +20,4 @@ ui_print "版本1.0"
 ui_print "作者：@LIghtJUNction"
 ui_print "github：https://github.com/LIghtJUNction/RootManage-Module-Model/blob/UniCron"
 
+set_perm_recursive $MODPATH 0 0 0755 0755
