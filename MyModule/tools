@@ -29,8 +29,6 @@ set_module_description(){
     sed -i "s/^description=.*/description=$(printf '%s' "${new_description//\//\\/}")/" "${MODULE_PROP}"
 }
 
-
-
 formatted_date() {
     date +"%Y-%m-%d %H:%M:%S.%3N"
 }
@@ -106,6 +104,32 @@ mihomo_run() {
     fi
 }
 
+# 每分钟执行一次 当存在init文件时执行
+init(){
+    if ! [ -f "${mihomo_config}" ]; then
+        log Error "配置文件 ${mihomo_config} 不存在"
+        exit 1
+    else    
+        log INFO "加载配置文件: ${mihomo_config}"
+        extracted_url=$(extract_sub_url)
+        if [ "$(grep "^url=" "$ENV_FILE" | cut -d'=' -f2)" != "订阅链接" ]; then
+            set_sub_url $(grep "^url=" "$ENV_FILE" | cut -d'=' -f2)
+            log INFO "已填写订阅链接"
+            rm -f $MODDIR/init
+        else
+            log INFO "请填写订阅链接"
+        fi  
+}
+
+# 每小时执行一次
+update(){
+    if [ pgrep -f mihomo ];then
+        set_module_description "[运行中🛡️-$(date '+%Y-%m-%d %H:%M:%S')] [mihomo]-$(${mihomo} -v | tr -d '\n')"
+    else
+        set_module_description "[已停止🙃]-重启方法:1.重启手机2.手动运行$MODDIR/boot-completed.sh"
+    fi
+    clean_old_logs
+}
 
 
 
