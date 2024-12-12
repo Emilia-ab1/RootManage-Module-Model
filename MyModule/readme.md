@@ -1,21 +1,10 @@
-使用本模块实现定时执行任务的方法指南
+API文件夹，存放各模块注册过来的定时配置（符号链接）
+Main文件夹，本模块具体实现代码
+cron/crontab/最终配置文件存放处，无需干预
+skip 不想扫描的模块（文件夹名，也就是moduleid）
 
-在模块目录下新建UniCron/模块名.cron文件
+请查看API文件夹查看教程
 
-模块名.cron参考：
-
-![1733927216504](images/readme/1733927216504.png)
-
-后面的文件路径表示需要定时执行的文件
-
-例如：
-
-![1733927424623](images/readme/1733927424623.png)
-
-不喜欢硬编码，可以echo "$MODDIR" > UniCron.cron
-
-总之方法千千万，你只要放到UniCron/xxx.cron里面，我的前置模块就能读取并添加到列表中
-
-不建议直接echo "cron语句" > data/adb/modules/UniCron/API/cron_tasks/模块名.cron里，你不打算移除了就这样写
-
-请去images文件夹查看图片
+tip：moduleid是文件夹名，和模块名概念不同
+比如zygisk next是模块名，但是moduleid是zygisksu（文件夹名）
+如何获取moduleid？很简单，在module.prop里面有，或者直接复制文件夹名也行。
