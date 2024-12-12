@@ -61,7 +61,11 @@ crontab() {
         # 强制杀死正在运行的 crontab 进程，以确保不会有多个 crontab 进程
         crontab_kill
         log INFO "crontab运行"
-        busybox crontab -c "$CRONTAB_DIR" "$TMP_FILE"  # 更新 crontab 配置
+        if [ -f $TMP_FILE ]; then
+            busybox crontab -c "$CRONTAB_DIR" "$TMP_FILE"  # 更新 crontab 配置
+        else
+            busybox crontab -c "$CRONTAB_DIR" "$BAK_FILE"
+        fi
     fi
 }
 

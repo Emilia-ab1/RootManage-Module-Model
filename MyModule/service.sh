@@ -12,10 +12,15 @@ until [ "$(getprop sys.boot_completed)" = "1" ]; do
     echo "等待开机完成"
     sleep 1
 done
+
+if [ -f $MODDIR/UniCron/done ];then
+    rm -r "$MODDIR/UniCron/done"
+fi
+
 set_module_description "模块即将启动"
 sleep 3
 
 log INFO "开机运行"
 $MODDIR/UniCron.sh
-crontabs 1
+crontab 1
 crond 1
