@@ -8,7 +8,6 @@ BAK_FILE="$API_DIR/bak.cron"
 CRON_TASKS_DIR="$API_DIR/cron_tasks"
 MODULES_DIR="/data/adb/modules"
 LOG_FILE="$MODDIR/UniCron.log"
-SKIP_FILE="$MODDIR/skip"
 MODULE_PROP="$MODDIR/module.prop"
 
 # 颜色定义
