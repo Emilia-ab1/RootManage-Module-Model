@@ -91,37 +91,9 @@ create_tun() {
     log INFO "/dev/net/tun 为字符设备，检查通过"
 }
 
-mihomo_prepare() {
-    if ! [ -f "${mihomo_config}" ]; then
-        log Error "配置文件 ${mihomo_config} 不存在"
-        exit 1
-    else
-        log INFO "加载配置文件: ${mihomo_config}"
-        # 循环提取URL并进行判断
-        while true; do
-            extracted_url=$(extract_sub_url)
-            if [ "$extracted_url" != "订阅链接" ]; then
-                log INFO "提取到的订阅链接: ${extracted_url}"
-                break
-            else   
-                log INFO "mihomo等待一个订阅链接 间隔10秒"      
-                set_module_description "正在等待一个订阅链接📝 请前往修改 $ENV_FILE 或者 $mihomo_config 读取到的URL:$extracted_url"
 
-                set_sub_url $(grep "^url=" "$ENV_FILE" | cut -d'=' -f2)
-                log INFO "尝试从备份恢复"   
-            fi
-            # 等你填订阅链接呢
-            sleep 10
-        done
-    fi
-    log INFO "备份链接"
-    echo "url=$extracted_url" > $ENV_FILE
-}
 
 mihomo_run() {
-    log INFO "启动 mihomo 内核..."
-    mihomo_prepare
-
     if [ -x "${mihomo}" ]; then
         # 启动 mihomo 内核，并将日志记录到指定文件
         set_module_description "mihomo启动!🛡️[内核启动时间🕓]-$(date '+%Y-%m-%d %H:%M:%S') [mihomo]-$(${mihomo} -v | tr -d '\n') 请注意查看日志!"
