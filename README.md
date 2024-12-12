@@ -1,6 +1,6 @@
-# UniCron 统一定时运行器 (前置模块)
+# UniTimeron 统一定时运行器 (前置模块) ksu专版--内置网页
 ## 版本介绍
-1.0 -- 使用 magisk/apatch/kernelsu内置busybox的applet：crond/crontab工具
+--
 
 ## 优点
 # 使用简单
@@ -8,6 +8,5 @@
 并统一管理(更新/移除/禁用)
 
 
-## 快速使用，查看示例模块
-本项目的MagicNet分支
+
 
