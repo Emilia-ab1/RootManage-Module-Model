@@ -1,3 +1,8 @@
+# Changelog 1.1
+* 细节小改动
+* 开机初始化更完善，确保模块正常运行
+
+
 # Changelog 1.0
 版本介绍
 1.0 -- 使用 magisk/apatch/kernelsu内置busybox的applet：crond/crontab工具
