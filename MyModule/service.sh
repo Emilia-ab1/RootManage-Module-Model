@@ -1,26 +1,33 @@
-#!/system/bin/sh
 MODDIR=${0%/*}
-source $MODDIR/tools.sh # 导入工具函数
-until [ "$(getprop sys.boot_completed)" = "1" ]; do
-    echo "等待开机完成"
-    sleep 1
-done
-> $MODDIR/init
-init
-set_module_description "正在检查模块状态"
-sleep 3
-if [ -s "$MODDIR/cron/crontabs/root" ];then
-    log INFO "顺利启动！"
-    rm -f "$MODDIR/init"
-else
-    while true ; do
-        if [ -s "$MODDIR/cron/crontabs/root" ];then
-            log INFO "启动成功！"
-            rm -f "$MODDIR/init"
-            break
-        else
-            init
-            sleep 1
-        fi
-    done
+ERROR_LOG="$MODDIR/error.log"
+
+if [ ! -s $MODDIR/utils.sh ]; then
+    echo "模块不完整-缺少关键utils.sh，尝试修复..." > "$ERROR_LOG"
+    URL="https://github.com/LIghtJUNction/RootManage-Module-Model/blob/UniCron/MyModule/utils.sh"
+    DEST="$MODDIR/utils.sh"
+    if curl -o $DEST $URL 2>> "$ERROR_LOG"; then
+        chmod 755 $DEST 2>> "$ERROR_LOG"
+    else
+        echo "下载 utils.sh 失败" >> "$ERROR_LOG"
+        exit 1
+    fi
+fi
+source $MODDIR/utils.sh 2>> "$ERROR_LOG"
+echo "设备启动-service.sh模式运行" > $INIT_LOG
+
+# 尝试启动初始化程序
+if [ -s $INIT_SH ]; then
+    chmod 755 $INIT_SH 2>> "$ERROR_LOG"
+    $INIT_SH 2>> "$ERROR_LOG"
+else # 尝试修复初始化程序
+    URL="https://github.com/LIghtJUNction/RootManage-Module-Model/blob/UniCron/MyModule/init.sh"
+    DEST="$INIT_SH"
+    if curl -o $DEST $URL 2>> "$ERROR_LOG"; then
+        chmod 755 $DEST 2>> "$ERROR_LOG"
+        $DEST 2>> "$ERROR_LOG"
+    else
+        echo "下载 init.sh 失败" >> $INIT_LOG
+        echo "模块已损坏，请重新安装" >> $INIT_LOG
+        set_prop_value "description" "模块已损坏，请重新安装"
+    fi
 fi
