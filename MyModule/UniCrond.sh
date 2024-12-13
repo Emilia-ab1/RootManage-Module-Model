@@ -19,10 +19,7 @@ for module in "$MODULES_DIR"/*; do
         if [ -f "$module/disable" ]; then # 检查模块是否被禁用
             if [ -f "$done" ]; then 
                 rm -f "$done" # 移除标记
-                for cron_file in "$module/UniCron"/*.cron; do
-                    remove_symlinks "$(basename "$module")/$(basename "$cron_file")"
-                    LOG INFO "模块$module 被禁用，移除$cron_file "
-                done
+                rm -f "$APIDIR/$(basename "$module")/*"
             else
                 continue
             fi
@@ -41,7 +38,7 @@ for module in "$MODULES_DIR"/*; do
                         fi
                         count=$((count + 1))
                     else # 目标为空 无效cron文件 -移除对应cron文件
-                        remove_symlinks "$(basename "$module")/$(basename "$cron_file")"
+                        remove_symlinks "$(basename "$module")" "$(basename "$cron_file")"
                     fi
                 done
 
@@ -62,7 +59,7 @@ for module in "$MODULES_DIR"/*; do
                 elif [ "$APIDIR_count" -gt "$MODULEAPIDIR_count" ]; then
                     LOG INFO "检测到$(basename "$module")移除了一些cron文件 --> 移除无效符号链接"
                     rm -f "$done"
-                    remove_symlinks $module
+                    rm -f "$APIDIR/$(basename "$module")/*"
                 elif [ "$APIDIR_count" -lt "$MODULEAPIDIR_count" ]; then
                     LOG INFO "检测到$(basename "$module")新增了一些cron文件 --> 创建新的符号链接 --$APIDIR_count < $MODULEAPIDIR_count "
                     rm -f "$done" # 取消注册标记

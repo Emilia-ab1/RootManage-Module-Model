@@ -118,6 +118,7 @@ crontab(){
     # 安装 crontab 文件，无需记录 PID
     busybox crontab -c "$CRONTABSDIR" "$file"
     echo "安装了新的 crontab 文件: $file" >> "$MODULE_LOG"
+    cat $file >> "$MODULE_LOG"
 }
 
 stop_crond(){
@@ -223,39 +224,34 @@ RUN() {
 }
 
 remove_symlinks() {
-    if [ -d "$1" ]; then
-        local moduledir="$1"
-        if [ -d "$APIDIR/$(basename "$moduledir")" ]; then
-            for link in "$APIDIR/$(basename "$moduledir")"/*; do
-                if [ ! -e "$link" ]; then
-                    if [ -f "$link" ]; then
-                        rm -f "$link"
-                        rm -f "$APIDIR/$(basename "$moduledir")_$(basename "$link")"
-                        LOG INFO "移除无效符号链接: $(basename "$moduledir")_$(basename "$link")"
-                    else
-                        LOG ERROR "尝试删除目录: $link，但此函数仅删除文件。"
-                    fi
-                fi
-            done
+    local moduleid="$1"
+    local cron_file_name="$2"
+
+    # 定义符号链接路径
+    local module_cron_link="$APIDIR/$moduleid/$cron_file_name"
+    local cron_link="$APIDIR/${moduleid}_${cron_file_name}"
+
+    # 删除单个链接的函数
+    delete_link() {
+        local link_path="$1"
+        if [ -e "$link_path" ]; then
+            if [ -f "$link_path" ] || [ -L "$link_path" ]; then
+                rm -f "$link_path"
+                LOG INFO "移除符号链接: $link_path"
+            else
+                LOG ERROR "尝试删除文件 $link_path，但文件不是普通文件或符号链接。"
+            fi
         else
-            LOG ERROR "$APIDIR/$(basename "$moduledir") 不存在"
+            LOG ERROR "尝试删除文件 $link_path，但文件不存在。"
         fi
-    else
-        local moduleid="$1"
-        local cron_file_name="$2"
-        local module_cron_link="$APIDIR/$moduleid/$cron_file_name"
-        local cron_link="$APIDIR/$cron_file_name"
-        if [ -f "$module_cron_link" ]; then
-            rm -f "$module_cron_link"
-        else
-            LOG ERROR "尝试删除文件 $module_cron_link，但文件不存在(空文件不创建对应的符号链接)或不是普通文件"
-        fi
-        if [ -f "$cron_link" ]; then
-            rm -f "$cron_link"
-        else
-            LOG ERROR "尝试删除文件 $cron_link，但文件不存在(空文件不创建对应的符号链接)或不是普通文件。"
-        fi
-    fi
+    }
+
+    # 删除模块特定的 cron 链接
+    delete_link "$module_cron_link"
+
+    # 删除组合的 cron 链接
+    delete_link "$cron_link"
 }
+
 
 
