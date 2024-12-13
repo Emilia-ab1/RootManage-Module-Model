@@ -230,10 +230,7 @@ init(){
     touch $MODDIR/cron/crontabs/root
     chmod +x $MODDIR/cron/crontabs/root
     chmod +x $MODDIR/API/cron_tasks
-    until [ "$(getprop sys.boot_completed)" = "1" ]; do
-        echo "等待开机完成"
-        sleep 1
-    done
+
     if [ -f $MODDIR/UniCron/done ];then
         rm -r "$MODDIR/UniCron/done"
     fi
