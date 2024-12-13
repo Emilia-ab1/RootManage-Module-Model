@@ -59,7 +59,8 @@ for module in "$MODULES_DIR"/*; do
                 elif [ "$APIDIR_count" -gt "$MODULEAPIDIR_count" ]; then
                     LOG INFO "检测到$(basename "$module")移除了一些cron文件 --> 移除无效符号链接"
                     rm -f "$done"
-                    rm -f "$APIDIR/$(basename "$module")/*"
+                    rm -f $APIDIR/$(basename "$module")_*
+                    rm -f $APIDIR/$(basename "$module")/*
                 elif [ "$APIDIR_count" -lt "$MODULEAPIDIR_count" ]; then
                     LOG INFO "检测到$(basename "$module")新增了一些cron文件 --> 创建新的符号链接 --$APIDIR_count < $MODULEAPIDIR_count "
                     rm -f "$done" # 取消注册标记
