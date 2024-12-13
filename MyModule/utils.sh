@@ -121,7 +121,7 @@ crontab(){
     local file="$1"
     # 安装 crontab 文件，无需记录 PID
     busybox crontab -c "$CRONTABSDIR" "$file"
-    echo "安装了新的 crontab 文件: $file" >> "$MODULE_LOG"
+    echo "刷新配置: $file" >> "$MODULE_LOG"
     cat $file >> "$MODULE_LOG"
 }
 
@@ -166,35 +166,42 @@ check(){
 
 merge_cron() {
     local output_file="$CRONDIR/Unicron_merged.cron"
-    local merged_content=""
+    local temp_file="$CRONDIR/temp_merged.cron"
+
+    # 清空临时文件
+    : > "$temp_file"
+
     # 检查是否有 .cron 文件
     if ls "$APIDIR"/*.cron >/dev/null 2>&1; then
-        # 遍历 $APIDIR 目录下所有 .cron 文件并合并到变量中
+        # 遍历 $APIDIR 目录下所有 .cron 文件并合并到临时文件中
         for cron_file in "$APIDIR"/*.cron; do
-            merged_content="${merged_content}$(cat "$cron_file")"
-            merged_content="${merged_content}
-"  # 添加实际的换行符以确保文件之间有分隔
+            cat "$cron_file" >> "$temp_file"
+            echo >> "$temp_file"  # 添加实际的换行符以确保文件之间有分隔
         done
     else
         LOG INFO "未找到任何 .cron 文件"
+        rm -f "$temp_file"
         return 1
     fi
 
-    # 获取现有内容
+    # 获取现有内容并比较
     if [ -f "$output_file" ]; then
-        existing_content="$(cat "$output_file")"
+        if cmp -s "$temp_file" "$output_file"; then
+            # 文件相同，无需更新
+            LOG INFO "无需更新"
+            rm -f "$temp_file"
+            return 1
+        else
+            # 文件不同，更新输出文件
+            mv "$temp_file" "$output_file"
+            LOG INFO "合并的 cron 文件已更新"
+            return 0
+        fi
     else
-        existing_content=""
-    fi
-
-    # 检查是否有变化
-    if [ "$merged_content" != "$existing_content" ]; then
-        # 有变化，写入目标文件
-        echo "$merged_content" > "$output_file"
+        # 输出文件不存在，直接移动临时文件到输出文件
+        mv "$temp_file" "$output_file"
+        LOG INFO "合并的 cron 文件已创建"
         return 0
-    else
-        # 无变化，返回 1
-        return 1
     fi
 }
 
@@ -207,8 +214,9 @@ RUN() {
         merge_cron
         if [ $? -eq 0 ]; then
             crontab "$CRONDIR/Unicron_merged.cron"
+            return 1
         else
-            LOG INFO "无需更新"
+            return 0
         fi
     fi
 }
