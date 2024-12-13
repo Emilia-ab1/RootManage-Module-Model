@@ -51,15 +51,19 @@ get_prop_value() {
 
 # 修改 module.prop 文件中的值
 set_prop_value() {
-    local key=$1
-    local value=$2
+    local key="$1"
+    local value="$2"
+    
+    # 将所有换行符替换为；
+    value=$(echo "$value" | tr '\n' ';')
+    
     if grep -q "^$key=" "$MODULE_PROP"; then
-        sed -i "s/^$key=.*/$key=$value/" "$MODULE_PROP"
+        # 使用 | 作为分隔符，避免与 / 冲突
+        sed -i "s|^$key=.*|$key=$value|" "$MODULE_PROP"
     else
         echo "$key=$value" >> "$MODULE_PROP"
     fi
 }
-
 add_to_list() {
     local list_file=$1
     local data=$2
@@ -150,28 +154,14 @@ stop_crond(){
     fi
 }
 
-format_cron_output() {
-    local input="$1"
-    local output=""
-    while IFS= read -r line; do
-        # 分割 cron 表达式和脚本路径
-        cron_expr=$(echo "$line" | awk '{print $1" "$2" "$3" "$4" "$5}')
-        script_path=$(echo "$line" | awk '{print $6}')
-        # 提取模块和脚本名
-        script="${script_path#/data/adb/modules/}"
-        output="${output}${script} ：${cron_expr}；"
-    done <<EOF
-$input
-EOF
-    # 去除最后的分号
-    output="${output%;}"
-    echo "$output"
-}
 
 check(){
-    local input=$(busybox crontab -c $CRONTABSDIR -l)
-    local output=$(format_cron_output $input)
-    set_prop_value "description" "$output"
+    if [ -s $CRONTABSDIR/root ]; then
+        local Wow=$(cat "$CRONTABSDIR/root")
+        set_prop_value "description" "$Wow"
+    else
+        set_prop_value "模块未正常启动！"
+    fi
 }
 
 merge_cron() {
