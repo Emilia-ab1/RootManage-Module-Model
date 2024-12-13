@@ -161,8 +161,8 @@ merge_crontabs() {
 
 UniCronMain() {
     log INFO “开始扫描”
+    init=$1
     for module in "$MODULES_DIR"/*; do
-    
         if [ -d "$module/UniCron" ]; then
             if [ -f "$module/disable" ]; then # 检查模块是否被禁用
                 if [ -f "$module/UniCron/done" ]; then 
@@ -180,7 +180,7 @@ UniCronMain() {
                     continue
                 fi
             else # 模块未被禁用
-                if [ ! -f "$module/UniCron/done" ]; then # 提取后缀为.cron的文件并创建符号链接               
+                if [ ! -f "$module/UniCron/done" ] || [ "$init" -eq 1 ]; then # 提取后缀为.cron的文件并创建符号链接               
                     count=0
                     for cron_file in "$module/UniCron"/*.cron; do
                         if [ -f "$cron_file" ]; then
@@ -222,4 +222,21 @@ UniCronMain() {
     done
 
     merge_crontabs
+}
+
+init(){
+    mkdir -p $MODDIR/cron/crontabs
+    mkdir -p $MODDIR/API/cron_tasks
+    touch $MODDIR/cron/crontabs/root
+    chmod +x $MODDIR/cron/crontabs/root
+    chmod +x $MODDIR/API/cron_tasks
+    until [ "$(getprop sys.boot_completed)" = "1" ]; do
+        echo "等待开机完成"
+        sleep 1
+    done
+    if [ -f $MODDIR/UniCron/done ];then
+        rm -r "$MODDIR/UniCron/done"
+    fi
+    UniCronMain 1
+
 }
