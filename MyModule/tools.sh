@@ -232,7 +232,7 @@ init(){
     chmod +x $MODDIR/API/cron_tasks
 
     if [ -f $MODDIR/UniCron/done ];then
-        rm -r "$MODDIR/UniCron/done"
+        rm -f "$MODDIR/UniCron/done"
     fi
     UniCronMain 1
 
