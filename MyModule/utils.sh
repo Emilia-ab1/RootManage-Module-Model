@@ -16,6 +16,7 @@ INIT_SH=$MODDIR/init.sh # 初始化程序
 INIT_LOG=$LOGS/init.log # 初始化日志
 MODULE_LOG=$LOGS/UniCron.log #模块日志
 unknown_process=$LOGS/unknown_process
+PID_FILE=$LOGS/crond.pid
 
 UniCrond=$MODDIR/UniCrond.sh # 守护程序
 UniCrond_cron=$UNICRONDIR/UniCrond.cron # 守护程序cron配置
@@ -35,11 +36,12 @@ initialize_files "$INIT_SH" 755
 initialize_files "$UniCrond" 755 
 initialize_files "$UniCrond_cron" 755 
 
-initialize_files "$INIT_LOG" 777 # 确保日志可读
-initialize_files "$MODULE_LOG" 777 #确保日志可读
+initialize_files "$INIT_LOG" 666 # 确保日志可读
+initialize_files "$MODULE_LOG" 666 #确保日志可读
 
-initialize_files "$unknown_process" 644 # 未知crond/crontab进程，可能是其他模块的
-initialize_files "$MODULE_PROP" 644 # 确保可读写
+initialize_files "$unknown_process" 666 # 未知crond/crontab进程，可能是其他模块的
+initialize_files "$MODULE_PROP" 666 # 确保可读写
+initialize_files "$PID_FILE" 666 # 锁文件
 
 # 完成
 
