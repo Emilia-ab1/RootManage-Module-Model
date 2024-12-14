@@ -10,6 +10,12 @@ echo "开始初始化UniCron" >> $INIT_LOG
 
 # 检查
 
+if [ -s $MODDIR/logs/crond.pid ];then
+    > $MODDIR/logs/crond.pid
+    echo "清空锁文件！" >> $INIT_LOG
+fi
+
+
 if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
     exit 1
@@ -22,18 +28,26 @@ until [ "$(getprop sys.boot_completed)" = "1" ]; do
 done
 
 
-# 检查是否有 crond/crontab 进程正在运行
-if pgrep -x "crond" > /dev/null; then
-    echo "检测到未知crond进程，加入名单：unknown_process" >> $unknown_process
-else
-    echo "好耶！未发现未知crond进程" >> $INIT_LOG
-fi
+# 清空 unknown_process 文件
+> "$unknown_process"
 
-if pgrep -x "crontab" > /dev/null; then
-    echo "检测到未知crontab进程，加入名单：unknown_process" >> $unknown_process
-else
-    echo "好耶！未发现未知crontab进程" >> $INIT_LOG
-fi
+# 检查是否有 busybox 版本和原版的 crond/crontab 进程正在运行
+check_process() {
+    local process_name="$1"
+
+    if pgrep -f "$process_name" > /dev/null; then
+        echo "检测到未知 $process_name 进程，加入名单：unknown_process" >> "$INIT_LOG"
+        echo "$(pgrep -f "$process_name")" >> "$unknown_process"
+    else
+        echo "好耶！未发现未知 $process_name 进程" >> "$INIT_LOG"
+    fi
+}
+
+# 检查 busybox 版本和原版的 crond 和 crontab 进程
+check_process "busybox crond"
+check_process "crond"
+check_process "busybox crontab"
+check_process "crontab"
 
 
 if [ ! -s $UniCrond_cron ]; then #检查守护程序cron配置是否正常

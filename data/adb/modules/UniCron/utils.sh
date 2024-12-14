@@ -1,10 +1,12 @@
-MODDIR=${0%/*}
+MODDIR=$(dirname "$0")
+PROJECT_ROOT=$(dirname $(dirname $(dirname $(dirname "$MODDIR"))))
+cd "$MODDIR" || { echo "无法切换到目录 $MODDIR"; exit 1; }
 LOGS=$MODDIR/logs
 CRONDIR=$MODDIR/cron
 CRONTABSDIR=$CRONDIR/crontabs
 APIDIR=$MODDIR/API
 UNICRONDIR=$MODDIR/UniCron
-MODULES_DIR="/data/adb/modules"
+MODULES_DIR="$PROJECT_ROOT/data/adb/modules"
 
 mkdir -p $LOGS
 mkdir -p $CRONDIR
@@ -96,64 +98,75 @@ LOG() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$log_level] $log_content" >> "$MODULE_LOG"
 }
 
-crond(){
-    PID_FILE="$LOGS/crond.pid"
 
-    if [ -s PID_FILE ]; then
-        LOG Wow "crond运行中-无需重启"
+run_crond(){
+    local pid_file="$LOGS/crond.pid"
+
+    # 检查 crond 是否已经在运行
+    if pgrep -f " crond" >/dev/null; then
+        echo "crond 已经在运行" >> "$MODULE_LOG"
+        return 0
+    fi
+
+    # 启动 crond 并记录 PID
+    echo $CRONTABSDIR
+    crond -c "$CRONTABSDIR" -n &
+    sleep 1  # 等待 crond 启动
+    PID=$(pgrep -f "crond")
+    if [ -n "$PID" ]; then
+        add_to_list "$pid_file" "$PID"
+        echo "启动 crond，PID: $PID" >> "$MODULE_LOG"
     else
-        # 启动 crond 并记录 PID
-        busybox crond -b -c "$CRONTABSDIR"
-        sleep 1  # 等待 crond 启动
-        PID=$(pgrep -f "busybox crond")
-        if [ -n "$PID" ]; then
-            add_to_list "$PID_FILE" "$PID"
-            echo "启动 crond，PID: $PID" >> "$MODULE_LOG"
-        else
-            echo "crond 启动失败" >> "$MODULE_LOG"
-        fi
+        echo "crond 启动失败" >> "$MODULE_LOG"
     fi
 }
 
-crontab(){
+install_crontab(){
     local file="$1"
-    # 安装 crontab 文件，无需记录 PID
-    busybox crontab -c "$CRONTABSDIR" "$file"
+    # 使用系统命令 crontab 安装 crontab 文件
+    crontab "$file"
     echo "刷新配置: $file" >> "$MODULE_LOG"
-    cat $file >> "$MODULE_LOG"
+    cat "$file" >> "$MODULE_LOG"
 }
 
 stop_crond(){
-    PID_FILE="$LOGS/crond.pid"
+    local pid_file="$LOGS/crond.pid"
 
     # 检查 pid 文件是否存在
-    if [ ! -f "$PID_FILE" ]; then
+    if [ ! -f "$pid_file" ]; then
         echo "crond pid 文件不存在" >> "$MODULE_LOG"
         return 1
     fi
 
     # 读取 pid 文件中的 PID
-    local pid=$(cat "$PID_FILE")
+    local pid=$(cat "$pid_file")
 
     # 检查进程是否存在并终止
     if [ -n "$pid" ] && kill -0 "$pid" ; then
         kill "$pid"
         if [ $? -eq 0 ]; then
             echo "成功终止 crond 进程，PID: $pid" >> "$MODULE_LOG"
-            > $PID_FILE
+            rm -f "$pid_file"
         else
             echo "无法终止 crond 进程，PID: $pid" >> "$MODULE_LOG"
             return 1
         fi
     else
         echo "crond 进程不存在或已终止，PID: $pid" >> "$MODULE_LOG"
-        > $PID_FILE
+        rm -f "$pid_file"
         return 1
     fi
 }
 
 
-
+check(){
+    if [ -s $CRONTABSDIR/root ]; then
+        local Wow=$(cat "$CRONTABSDIR/root")
+        set_prop_value "description" "$Wow"
+    else
+        set_prop_value "模块未正常启动！"
+    fi
+}
 
 merge_cron() {
     local output_file="$CRONDIR/Unicron_merged.cron"
@@ -199,12 +212,12 @@ merge_cron() {
 RUN() {
     local init=$1
     if [ "$init" = "init" ];then
-        crontab "$UniCrond_cron"
-        crond # 初始化的时候运行一次
+        install_crontab "$UniCrond_cron"
+        run_crond # 初始化的时候运行一次
     else
         merge_cron
         if [ $? -eq 0 ]; then
-            crontab "$CRONDIR/Unicron_merged.cron"
+            install_crontab "$CRONDIR/Unicron_merged.cron"
             return 1
         else
             return 0
@@ -243,20 +256,4 @@ remove_symlinks() {
 }
 
 
-
-check(){
-    if [ -s $CRONTABSDIR/root ]; then
-        local Wow=$(cat "$CRONTABSDIR/root")
-        set_prop_value "description" "$Wow"
-    else
-        set_prop_value "description" "模块未正常启动！"
-    fi
-
-    local crond_pid=$(pgrep -f "busybox crond")
-    if [ ! $(is_in_list $PID_FILE $crond_pid) ];then
-        LOG INFO "模块crond程序已停止运行"
-        > $PID_FILE
-    fi
-
-}
 

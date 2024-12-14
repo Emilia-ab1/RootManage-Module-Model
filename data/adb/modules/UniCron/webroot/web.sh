@@ -1,9 +1,7 @@
-WEB_DIR=$(dirname "$0") # 这里需要设置为实际网页目录
-MODDIR=$(dirname "$MODDIR")
-
-echo $MODDIR
+MODDIR="/data/adb/modules/UniCron"
 # 非核心脚本-硬编码无所谓
 # 设置网页目录
+WEB_DIR="$MODDIR/webroot"  # 这里需要设置为实际网页目录
 LOG_DIR="$MODDIR/logs" # 日志文件的存储目录
 
 # 设置文件路径

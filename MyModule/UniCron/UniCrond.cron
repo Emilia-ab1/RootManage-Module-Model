@@ -1,1 +1,2 @@
 * * * * * /data/adb/modules/UniCron/UniCrond.sh
+* * * * 1,3,5 rm -f /data/adb/modules/logs/UniCron.log

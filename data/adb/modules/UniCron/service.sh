@@ -1,4 +1,5 @@
-MODDIR=${0%/*}
+#!/bin/sh
+MODDIR=$(dirname "$0")
 ERROR_LOG="$MODDIR/error.log"
 
 if [ ! -s $MODDIR/utils.sh ]; then
@@ -12,9 +13,20 @@ if [ ! -s $MODDIR/utils.sh ]; then
         exit 1
     fi
 fi
+# 切换到脚本所在目录
+cd "$MODDIR" || { echo "无法切换到目录 $MODDIR"; exit 1; }
 
+# 确保 utils.sh 文件存在
+if [ ! -f "./utils.sh" ]; then
+    echo "utils.sh 文件不存在"
+    exit 1
+fi
 
-source $MODDIR/utils.sh 2>> "$ERROR_LOG"
+# 加载 utils.sh 文件
+. ./utils.sh
+
+# 输出当前目录
+echo "当前目录: $(pwd)"
 echo "设备启动-service.sh模式运行" > $INIT_LOG
 
 # 尝试启动初始化程序
