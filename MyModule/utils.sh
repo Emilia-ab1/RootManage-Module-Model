@@ -8,8 +8,6 @@ MODULES_DIR="/data/adb/modules"
 
 # webroot
 WEBROOT=$MODDIR/webroot
-webroot_status=$WEBROOT/status
-webroot_log=$WEBROOT/log
 # webroot
 
 mkdir -p $LOGS
@@ -30,6 +28,7 @@ UniCrond=$MODDIR/UniCrond.sh # 守护程序
 UniCrond_cron=$UNICRONDIR/UniCrond.cron # 守护程序cron配置
 
 MODULE_PROP=$MODDIR/module.prop
+
 
 initialize_files() {
     local file=$1
@@ -52,10 +51,7 @@ initialize_files "$MODULE_PROP" 666 # 确保可读写
 initialize_files "$CROND_PID" 666 # 锁文件
 initialize_files "$ALL_CRON" 666 # 确保可读写
 
-# WEBROOT
-initialize_files "$webroot_status" 666
-initialize_files "$webroot_log" 666
-# WEBROOT
+
 
 # 完成
 
@@ -137,7 +133,7 @@ kill_processes() {
 LOG() {
     local log_level=$1
     local log_content=$2
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$log_level] $log_content" | tee "$MODULE_LOG" "$webroot_log"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$log_level] $log_content" >> $MODULE_LOG
 }
 
 remove_symlinks() {
@@ -171,7 +167,7 @@ remove_symlinks() {
 }
 
 ###################################################################################
-# 应急函数---特殊函数
+# 应急函数---特殊函数 init初始化时使用
 remove_done_files() {
     for dir in "$APIDIR"/*/; do
         if [ -d "$dir" ]; then
@@ -230,12 +226,14 @@ merge_cron() {
     fi
 }
 
+
 # DO ONE THING
 crond(){
     # 启动 crond 返回PID
     busybox crond -b -c "$CRONTABSDIR" 2>>"$MODDIR/error.log"
     sleep 1  # 等待进程启动
-    pgrep -f "busybox crond -b -c \"$CRONTABSDIR\"" > "$CROND_PID"
+    pid=$(pgrep -f "busybox crond -b -c $CRONTABSDIR" | head -n 1)
+    echo "$pid" > "$CROND_PID"
 }
 
 crontab(){
@@ -273,7 +271,9 @@ RUN() {
                 LOG ERROR "未知错误！请重新安装模块！"  
             fi
         fi
+        
     else # 守护运行模式
+        echo "守护模式"
         crontab $ALL_CRON
     fi
 }
