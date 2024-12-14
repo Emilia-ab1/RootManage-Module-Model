@@ -46,7 +46,6 @@ for module in "$MODULES_DIR"/*; do
                 if [ "$count" -gt 0 ]; then # 如果至少有一个符号链接被创建
                     touch "$done"
                     LOG INFO "成功注册模块: $(basename "$module")，数量: $count"
-                    check
                 else
                     continue
                 fi
