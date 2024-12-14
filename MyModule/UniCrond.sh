@@ -75,3 +75,6 @@ done
 RUN
 
 check
+
+# 拓展部分 非核心功能
+$MODDIR/webroot/web.sh
