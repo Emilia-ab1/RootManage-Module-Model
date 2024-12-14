@@ -11,7 +11,7 @@ echo "开始初始化UniCron" >> $INIT_LOG
 # 检查
 
 if [ -s $MODDIR/logs/crond.pid ];then
-    stop_crond
+    kill_processes "$MODDIR/logs/crond.pid"
     > $MODDIR/logs/crond.pid
     echo "清空锁文件！" >> $INIT_LOG
 fi
@@ -96,8 +96,8 @@ else
     LOG INFO "修复完成-继续启动"
     RUN init
 fi
-# 立即启动UniCrond程序
-$UniCrond
+
+remove_done_files
 
 echo "初始化完成！" >> $INIT_LOG
 LOG INFO "初始化完成，开始运行UniCrond"
