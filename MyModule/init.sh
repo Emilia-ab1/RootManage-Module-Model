@@ -30,7 +30,7 @@ echo "确保符号链接：$MODULE_LOG -> $WEBROOT/UniCron.log 和 $CRONTABSDIR/
 
 if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
-    stop_crond # 冗余-避免模块禁用，但本模块crond还在运行
+    stop_crond 
     exit 1
 fi
 
@@ -94,7 +94,7 @@ fi
 remove_done_files
 echo "启动守护进程......" >> $INIT_LOG
 if [ -s $UniCrond_cron ]; then # 前面刚刚检查过了 ，这里以防万一再来一遍
-    RUN init
+    RUN init  # 关键点
 else
     LOG ERROR "模块缺失$UniCrond_cron，正在尝试修复"
     echo "* * * * * /data/adb/modules/UniCron/UniCrond.sh" > $UniCrond_cron

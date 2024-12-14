@@ -5,7 +5,7 @@ source $MODDIR/utils.sh 2>> "$ERROR_LOG"
 
 
 # 检查
-if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
+if [ -f $MODDIR/disable ]; then 
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
     stop_crond
     exit 1
@@ -50,7 +50,7 @@ for module in "$MODULES_DIR"/*; do
                     continue
                 fi
 
-            else # 跳过已注册模块
+            else # 已注册模块
                 APIDIR_count=$(find "$APIDIR/$(basename "$module")/" -type l -name "*.cron" | wc -l)
                 MODULEAPIDIR_count=$(find "$module/UniCron" -type f -name "*.cron" | wc -l)
                 
@@ -63,6 +63,7 @@ for module in "$MODULES_DIR"/*; do
                     rm -f $APIDIR/$(basename "$module")/*
                 elif [ "$APIDIR_count" -lt "$MODULEAPIDIR_count" ]; then
                     LOG INFO "检测到$(basename "$module")新增了一些cron文件 --> 创建新的符号链接 --$APIDIR_count < $MODULEAPIDIR_count "
+                    delete_empty_files "$module/UniCron"
                     rm -f "$done" # 取消注册标记
                 fi
             fi
@@ -79,6 +80,16 @@ if [ $? -eq 1 ]; then
     RUN # 发生更新！
 #else # 无需更新
 fi
+sleep 50
 
+UniCron_deamon
 
+# 模块60秒定时运行一次 
+# 0：00分开始执行 在极短的时间 本模块就能完成上述任务
+# 大约0：50 模块睡醒了 ，如果有哪个crond模块在[ 0：00 --> 0:50   ]  内误杀了我的crond进程
+# 没关系 我会复活
+# 除非你能在最后这10秒把本模块给干了
 
+# 也就是说在其他模块疯狂杀进程的情况下，本模块只有大约1/6左右的几率被杀进程(crond)
+
+# 声明： 本模块不杀其他crond进程 （低于5个的情况下-这是为了避免潜在的bug导致cron进程被不停创建）

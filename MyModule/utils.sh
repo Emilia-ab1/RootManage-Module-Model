@@ -166,6 +166,16 @@ remove_symlinks() {
     delete_link "$cron_link"
 }
 
+delete_empty_files() {
+    local dir="$1"
+    if [ -d "$dir" ]; then
+        find "$dir" -type f -empty -delete
+        echo "已删除目录 $dir 中的所有空文件"
+    else
+        echo "目录 $dir 不存在"
+    fi
+}
+
 ###################################################################################
 # 应急函数---特殊函数 init初始化时使用
 remove_done_files() {
@@ -178,7 +188,21 @@ remove_done_files() {
         fi
     done
 }
-
+# 判断进程数量是否合理
+get_crond_process_count() {
+    pgrep -f "busybox crond -b -c $CRONTABSDIR" | wc -l
+}
+# 避免因为某些未知原因导致cron进程创建过多
+KILL_ALL(){
+    for pid in $(pgrep -f "busybox cron"); do
+        kill $pid
+        if [ $? -eq 0 ]; then
+            echo "杀死 $pid"
+        else
+            echo "未能杀死 $pid"
+        fi
+    done
+}
 
 # 核心函数################################################
 merge_cron() {
@@ -243,6 +267,26 @@ crontab(){
 
 stop_crond(){
     kill_processes $CROND_PID
+}
+
+UniCron_deamon(){
+
+    local pid=$(cat $CROND_PID)
+    if [ ! -d "/proc/$pid" ];then # 进程未在运行
+        LOG ERROR "UniCrond被意外杀死，尝试复活"
+        > $CROND_PID
+        RUN init # 起死回生术
+    fi
+    local crond_count=$(get_crond_process_count)
+    if [ "$crond_count" -gt 5 ]; then
+        KILL_ALL
+        LOG INFO "超过5个 crond 进程，已杀死全部 crond 进程"
+        LOG INFO "即将复活------"
+        sleep 3
+        $INIT_SH
+    else
+        LOG INFO "当前 crond 进程数: $crond_count"
+    fi
 }
 
 
