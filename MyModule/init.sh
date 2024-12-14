@@ -9,9 +9,12 @@ source $MODDIR/utils.sh
 echo "开始初始化UniCron" >> $INIT_LOG
 
 # 检查
+if [ -s $ALL_CRON ];then
+    rm -f $ALL_CRON
+fi
 
 if [ -s $MODDIR/logs/crond.pid ];then
-    kill_processes "$MODDIR/logs/crond.pid"
+    stop_crond 2> $INIT_LOG
     > $MODDIR/logs/crond.pid
     echo "清空锁文件！" >> $INIT_LOG
 fi
@@ -20,9 +23,10 @@ if [ -s $MODDIR/logs/UniCron.log ];then
     > $MODDIR/logs/UniCron.log
 fi
 
-if [ -s $MODDIR/webroot/log ];then
-    > $MODDIR/webroot/log
-fi
+# 确保符号链接存在
+ln -sf "$MODULE_LOG" "$WEBROOT/UniCron.log"
+ln -sf "$CRONTABSDIR/root" "$WEBROOT/root"
+echo "确保符号链接：$MODULE_LOG -> $WEBROOT/UniCron.log 和 $CRONTABSDIR/root -> $WEBROOT/root" >> $INIT_LOG
 
 if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
@@ -87,17 +91,19 @@ fi
 
 
 # 启动-守护进程
+remove_done_files
 echo "启动守护进程......" >> $INIT_LOG
 if [ -s $UniCrond_cron ]; then # 前面刚刚检查过了 ，这里以防万一再来一遍
     RUN init
 else
     LOG ERROR "模块缺失$UniCrond_cron，正在尝试修复"
     echo "* * * * * /data/adb/modules/UniCron/UniCrond.sh" > $UniCrond_cron
+    echo "* * * * 1,3,5 rm -f /data/adb/modules/logs/UniCron.log" >> $UniCrond_cron
     LOG INFO "修复完成-继续启动"
     RUN init
 fi
 
-remove_done_files
+
 
 echo "初始化完成！" >> $INIT_LOG
 LOG INFO "初始化完成，开始运行UniCrond"
