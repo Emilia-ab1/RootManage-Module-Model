@@ -6,17 +6,25 @@ APIDIR=$MODDIR/API
 UNICRONDIR=$MODDIR/UniCron
 MODULES_DIR="/data/adb/modules"
 
+# webroot
+WEBROOT=$MODDIR/webroot
+webroot_status=$WEBROOT/status
+webroot_log=$WEBROOT/log
+# webroot
+
 mkdir -p $LOGS
 mkdir -p $CRONDIR
 mkdir -p $CRONTABSDIR
 mkdir -p $APIDIR
 mkdir -p $UNICRONDIR
+mkdir -p $WEBROOT
 
 INIT_SH=$MODDIR/init.sh # 初始化程序
 INIT_LOG=$LOGS/init.log # 初始化日志
 MODULE_LOG=$LOGS/UniCron.log #模块日志
 unknown_process=$LOGS/unknown_process
-PID_FILE=$LOGS/crond.pid
+CROND_PID=$LOGS/crond.pid
+ALL_CRON=$CRONDIR/ALL.cron
 
 UniCrond=$MODDIR/UniCrond.sh # 守护程序
 UniCrond_cron=$UNICRONDIR/UniCrond.cron # 守护程序cron配置
@@ -41,10 +49,17 @@ initialize_files "$MODULE_LOG" 666 #确保日志可读
 
 initialize_files "$unknown_process" 666 # 未知crond/crontab进程，可能是其他模块的
 initialize_files "$MODULE_PROP" 666 # 确保可读写
-initialize_files "$PID_FILE" 666 # 锁文件
+initialize_files "$CROND_PID" 666 # 锁文件
+initialize_files "$ALL_CRON" 666 # 确保可读写
+
+# WEBROOT
+initialize_files "$webroot_status" 666
+initialize_files "$webroot_log" 666
+# WEBROOT
 
 # 完成
 
+# 基础函数 #########################################################
 # 读取 module.prop 文件中的值
 get_prop_value() {
     local key=$1
@@ -77,7 +92,7 @@ add_to_list() {
 
     # 将数据添加到名单文件
     echo "$data" >> "$list_file"
-    echo "数据 '$data' 已加入名单文件 '$list_file'" >> "$MODULE_LOG"
+    # echo "数据 '$data' 已加入名单文件 '$list_file'" >> "$MODULE_LOG"
 }
 
 # 查询函数，检查文件的某一行是否包含指定字符串
@@ -92,126 +107,37 @@ is_in_list() {
 }
 # 解释: 这里的0/1表示退出状态码 正常退出是0 异常是1 
 
+kill_processes() {
+    local ALL="$1"
+    local white_list="$2"
+    
+    if [ -z "$white_list" ]; then
+        # 如果白名单不存在，杀死名单ALL中的所有进程
+        while IFS= read -r pid; do
+            if kill -9 "$pid" 2>/dev/null; then
+                LOG INFO "已杀死进程 ID: $pid"
+            else
+                LOG ERROR "无法杀死进程 ID: $pid"
+            fi
+        done < "$ALL"
+    else
+        # 杀死名单ALL中不在白名单中的进程
+        while IFS= read -r pid; do
+            if ! grep -qw "$pid" "$white_list"; then
+                if kill -9 "$pid" 2>/dev/null; then
+                    LOG INFO "已杀死进程 ID: $pid"
+                else
+                    LOG ERROR "无法杀死进程 ID: $pid"
+                fi
+            fi
+        done < "$ALL"
+    fi
+}
+
 LOG() {
     local log_level=$1
     local log_content=$2
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$log_level] $log_content" >> "$MODULE_LOG"
-}
-
-crond(){
-    PID_FILE="$LOGS/crond.pid"
-
-    if [ -s PID_FILE ]; then
-        LOG Wow "crond运行中-无需重启"
-    else
-        # 启动 crond 并记录 PID
-        busybox crond -b -c "$CRONTABSDIR"
-        sleep 1  # 等待 crond 启动
-        PID=$(pgrep -f "busybox crond")
-        if [ -n "$PID" ]; then
-            add_to_list "$PID_FILE" "$PID"
-            echo "启动 crond，PID: $PID" >> "$MODULE_LOG"
-        else
-            echo "crond 启动失败" >> "$MODULE_LOG"
-        fi
-    fi
-}
-
-crontab(){
-    local file="$1"
-    # 安装 crontab 文件，无需记录 PID
-    busybox crontab -c "$CRONTABSDIR" "$file"
-    echo "刷新配置: $file" >> "$MODULE_LOG"
-    cat $file >> "$MODULE_LOG"
-}
-
-stop_crond(){
-    PID_FILE="$LOGS/crond.pid"
-
-    # 检查 pid 文件是否存在
-    if [ ! -f "$PID_FILE" ]; then
-        echo "crond pid 文件不存在" >> "$MODULE_LOG"
-        return 1
-    fi
-
-    # 读取 pid 文件中的 PID
-    local pid=$(cat "$PID_FILE")
-
-    # 检查进程是否存在并终止
-    if [ -n "$pid" ] && kill -0 "$pid" ; then
-        kill "$pid"
-        if [ $? -eq 0 ]; then
-            echo "成功终止 crond 进程，PID: $pid" >> "$MODULE_LOG"
-            > $PID_FILE
-        else
-            echo "无法终止 crond 进程，PID: $pid" >> "$MODULE_LOG"
-            return 1
-        fi
-    else
-        echo "crond 进程不存在或已终止，PID: $pid" >> "$MODULE_LOG"
-        > $PID_FILE
-        return 1
-    fi
-}
-
-
-
-
-merge_cron() {
-    local output_file="$CRONDIR/Unicron_merged.cron"
-    local temp_file="$CRONDIR/temp_merged.cron"
-
-    # 清空临时文件
-    : > "$temp_file"
-
-    # 检查是否有 .cron 文件
-    if ls "$APIDIR"/*.cron >/dev/null 2>&1; then
-        # 遍历 $APIDIR 目录下所有 .cron 文件并合并到临时文件中
-        for cron_file in "$APIDIR"/*.cron; do
-            cat "$cron_file" >> "$temp_file"
-            echo >> "$temp_file"  # 添加实际的换行符以确保文件之间有分隔
-        done
-    else
-        LOG INFO "未找到任何 .cron 文件"
-        rm -f "$temp_file"
-        return 1
-    fi
-
-    # 获取现有内容并比较
-    if [ -f "$output_file" ]; then
-        if cmp -s "$temp_file" "$output_file"; then
-            # 文件相同，无需更新
-            LOG INFO "无需更新"
-            rm -f "$temp_file"
-            return 1
-        else
-            # 文件不同，更新输出文件
-            mv "$temp_file" "$output_file"
-            LOG INFO "合并的 cron 文件已更新"
-            return 0
-        fi
-    else
-        # 输出文件不存在，直接移动临时文件到输出文件
-        mv "$temp_file" "$output_file"
-        LOG INFO "合并的 cron 文件已创建"
-        return 0
-    fi
-}
-
-RUN() {
-    local init=$1
-    if [ "$init" = "init" ];then
-        crontab "$UniCrond_cron"
-        crond # 初始化的时候运行一次
-    else
-        merge_cron
-        if [ $? -eq 0 ]; then
-            crontab "$CRONDIR/Unicron_merged.cron"
-            return 1
-        else
-            return 0
-        fi
-    fi
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$log_level] $log_content" | tee "$MODULE_LOG" "$webroot_log"
 }
 
 remove_symlinks() {
@@ -244,21 +170,113 @@ remove_symlinks() {
     delete_link "$cron_link"
 }
 
-
-
-check(){
-    if [ -s $CRONTABSDIR/root ]; then
-        local Wow=$(cat "$CRONTABSDIR/root")
-        set_prop_value "description" "$Wow"
-    else
-        set_prop_value "description" "模块未正常启动！"
-    fi
-
-    local crond_pid=$(pgrep -f "busybox crond")
-    if [ ! $(is_in_list $PID_FILE $crond_pid) ];then
-        LOG INFO "模块crond程序已停止运行"
-        > $PID_FILE
-    fi
-
+###################################################################################
+# 应急函数---特殊函数
+remove_done_files() {
+    for dir in "$APIDIR"/*/; do
+        if [ -d "$dir" ]; then
+            done_file="${dir}done"
+            if [ -f "$done_file" ]; then
+                rm -f "$done_file" && LOG INFO "已删除文件: $done_file"
+            fi
+        fi
+    done
 }
+
+
+# 核心函数################################################
+merge_cron() {
+    local output_file="$CRONDIR/ALL.cron"
+    local temp_file="$CRONDIR/temp_merged.cron"
+
+    # 清空临时文件
+    : > "$temp_file"
+
+    # 检查是否有 .cron 文件
+    if ls "$APIDIR"/*.cron >/dev/null 2>&1; then
+        # 遍历 $APIDIR 目录下所有 .cron 文件并合并到临时文件中
+        for cron_file in "$APIDIR"/*.cron; do
+            cat "$cron_file" >> "$temp_file"
+            echo >> "$temp_file"  # 添加实际的换行符以确保文件之间有分隔
+        done
+    else # 意外情况！
+        LOG INFO "$APIDIR 未找到任何 .cron 文件!" 
+        rm -f "$temp_file"
+        remove_done_files # 意外情况-移除done标记，强制更新
+        set_prop_value "description" "[ $(date) ]模块出错！"
+        LOG ERROR "未找到任何 .cron 文件"
+        merge_cron # 递归 -- 移除done标记符号后重试一次
+        return 1 
+    fi
+
+    # 获取现有内容并比较
+    if [ -f "$output_file" ]; then
+        if cmp -s "$temp_file" "$output_file"; then
+            # 文件相同，无需更新
+            # LOG INFO "无需更新" 废话日志 
+            rm -f "$temp_file"
+            return 0
+        else
+            # 文件不同，更新输出文件
+            mv "$temp_file" "$output_file"
+            LOG INFO "合并的 cron 文件已更新"
+            return 1
+        fi
+    else
+        # 输出文件不存在，直接移动临时文件到输出文件
+        mv "$temp_file" "$output_file"
+        LOG INFO "合并的 cron 文件已创建"
+        return 1
+    fi
+}
+
+# DO ONE THING
+crond(){
+    # 启动 crond 返回PID
+    busybox crond -b -c "$CRONTABSDIR" 2>>"$MODDIR/error.log"
+    sleep 1  # 等待进程启动
+    pgrep -f "busybox crond -b -c \"$CRONTABSDIR\"" > "$CROND_PID"
+}
+
+crontab(){
+    local file="$1"
+    busybox crontab -c "$CRONTABSDIR" "$file"
+}
+
+stop_crond(){
+    kill_processes $CROND_PID
+}
+
+
+# 以上均为函数部分 新建目录/设置权限
+#####################################################################
+# 首次运行--运行crond  守护运行 --crontab
+RUN() {
+    local init=$1
+    if [ "$init" = "init" ];then # 初始化运行模式
+        if [ -s $UniCrond_cron ];then
+            crontab "$UniCrond_cron"
+            crond # 初始化的时候运行一次
+            if [ $? -eq 0 ]; then
+                LOG INFO "crond顺利启动"
+            else
+                LOG ERROR "crond初次运行失败！"  
+            fi
+        else
+            echo "* * * * * /data/adb/modules/UniCron/UniCrond.sh" > $UniCrond_cron
+            echo "* * * * 1,3,5 rm -f /data/adb/modules/logs/UniCron.log" >> $UniCrond_cron
+            crontab "$UniCrond_cron"
+            crond # 尝试救回进程
+            if [ $? -eq 0 ]; then
+                LOG INFO "crond启动！"
+            else
+                LOG ERROR "未知错误！请重新安装模块！"  
+            fi
+        fi
+    else # 守护运行模式
+        crontab $ALL_CRON
+    fi
+}
+
+
 

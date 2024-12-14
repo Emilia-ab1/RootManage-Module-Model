@@ -11,13 +11,22 @@ echo "开始初始化UniCron" >> $INIT_LOG
 # 检查
 
 if [ -s $MODDIR/logs/crond.pid ];then
+    stop_crond
     > $MODDIR/logs/crond.pid
     echo "清空锁文件！" >> $INIT_LOG
 fi
 
+if [ -s $MODDIR/logs/UniCron.log ];then
+    > $MODDIR/logs/UniCron.log
+fi
+
+if [ -s $MODDIR/webroot/log ];then
+    > $MODDIR/webroot/log
+fi
 
 if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
+    stop_crond # 冗余-避免模块禁用，但本模块crond还在运行
     exit 1
 fi
 
@@ -91,4 +100,5 @@ fi
 $UniCrond
 
 echo "初始化完成！" >> $INIT_LOG
+LOG INFO "初始化完成，开始运行UniCrond"
 set_prop_value "description" "初始化完成！"

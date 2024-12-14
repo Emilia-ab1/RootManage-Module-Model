@@ -3,6 +3,7 @@ MODDIR=${0%/*}
 ERROR_LOG="$MODDIR/error.log"
 source $MODDIR/utils.sh 2>> "$ERROR_LOG"
 
+
 # 检查
 if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
@@ -11,7 +12,7 @@ if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运
 fi
 
 # 扫描
-log INFO "开始扫描"
+#  LOG INFO "开始扫描" 废话日志-配置文件大多数情况都是没有变化的
 for module in "$MODULES_DIR"/*; do
     mkdir -p "$APIDIR/$(basename "$module")"
     done="$APIDIR/$(basename "$module")/done"
@@ -72,9 +73,13 @@ for module in "$MODULES_DIR"/*; do
     fi
 done
 
-RUN
+# 接下来是运行部分 -- 仅运行crontab和检查crond是否正在运行
 
-check
+merge_cron
+if [ $? -eq 1 ]; then
+    RUN # 发生更新！
+#else # 无需更新
+fi
 
-# 拓展部分 非核心功能
-$MODDIR/webroot/web.sh
+
+
