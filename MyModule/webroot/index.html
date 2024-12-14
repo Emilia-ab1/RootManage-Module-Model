@@ -4,91 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniCron-任务面板</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #2b2d2b; 
-            color: #2bebb5; 
-            transition: background-color 1s, color 2s;
-        }
-
-        body.dark-mode {
-            background-color: #121212; 
-            color: #aacfa3; 
-        }
-
-        pre {
-            background-color: #a1a1a1; 
-            color: #19351e; 
-            padding: 10px;
-            border: 1px solid #343833; 
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        #status, #log {
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 10px;
-            margin: 5px;
-            cursor: pointer;
-            border: none;
-            background-color: #021e08;
-            color: #5c683e;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.5s;
-        }
-
-        button:hover {
-            background-color: #043222aa;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="dark-mode"> <!-- 默认加载暗色模式 -->
+<body class="dark-mode">
+    <div class="background"></div>
 
-<h1>UniCron-任务面板</h1>
+    <div class="container">
+        <h1 id="mainTitle">UniCron-任务面板</h1>
 
-<!-- 暗色模式切换按钮 -->
-<button id="toggleMode">明暗切换</button>
+        <div class="btn-group">
+            <button id="toggleMode">🌚</button>
+            <button class="github-btn" id="githubBtn">GitHub 项目</button>
+            <button id="refreshBtn">刷新文件</button>
+        </div>
 
-<div id="status">
-    <h2>模块状态</h2>
-    <pre id="statusContent">加载中...</pre>
-</div>
+        <div class="card" draggable="false">
+            <h2>模块状态</h2>
+            <pre id="statusContent">加载中...</pre>
+        </div>
 
-<div id="log">
-    <h2>日志</h2>
-    <pre id="logContent">加载中...</pre>
-</div>
+        <div class="card" draggable="false">
+            <h2>日志</h2>
+            <pre id="logContent">加载中...</pre>
+        </div>
+    </div>
 
-<script>
-    // 加载文件内容
-    function loadFile(filePath, elementId) {
-        fetch(filePath)
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById(elementId).textContent = data;
-            })
-            .catch(error => {
-                document.getElementById(elementId).textContent = '无法加载文件: ' + error;
-            });
-    }
+    <!-- 转场覆盖层 -->
+    <div id="transitionOverlay"></div>
 
-    // 加载模块状态与日志文件
-    loadFile('status', 'statusContent');
-    loadFile('log', 'logContent');
-
-    // 切换暗色模式与明亮模式
-    document.getElementById('toggleMode').addEventListener('click', function () {
-        document.body.classList.toggle('dark-mode');
-        let isDarkMode = document.body.classList.contains('dark-mode');
-        this.textContent = isDarkMode ? '🌚' : '☀️';
-    });
-</script>
-
+    <script src="scripts.js"></script>
 </body>
 </html>

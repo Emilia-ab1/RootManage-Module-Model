@@ -1,0 +1,289 @@
+/* CSS变量定义 */
+:root {
+    --transition-speed: 0.5s;
+    --dark-bg: #121212;
+    --dark-text: #aacfa3;
+    --light-bg: #f0f0f0;
+    --light-text: #333333;
+    --btn-bg: #1f1f1f;
+    --btn-hover-bg: #333333;
+    --btn-text: #ffffff;
+    --github-btn-bg: #24292e;
+    --github-btn-hover-bg: #2c3137;
+    --pre-bg-dark: rgba(0, 0, 0, 0.6);
+    --pre-text-dark: #e0e0e0;
+    --pre-bg-light: rgba(0, 0, 0, 0.05);
+    --pre-text-light: #333333;
+    --card-bg-dark: rgba(255, 255, 255, 0.05);
+    --card-bg-light: rgba(255, 255, 255, 0.8);
+    --card-shadow-dark: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --card-shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    --fireworks-color: #ff4081;
+}
+
+/* 基础样式 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 背景效果 */
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(-45deg, #1f1f1f, #2b2d2b, #1f1f1f, #2b2d2b);
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
+    z-index: -2;
+}
+
+/* 渐变动画 */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 容器样式 */
+.container {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    transition: background var(--transition-speed) ease;
+}
+
+/* 标题样式 */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.8em;
+    color: inherit;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #5c683e;
+    margin: 10px auto 0;
+    border-radius: 2px;
+    transition: background var(--transition-speed);
+}
+
+/* 按钮组 */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    gap: 20px;
+}
+
+/* 按钮样式 */
+button {
+    padding: 12px 28px;
+    cursor: pointer;
+    border: none;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    border-radius: 30px;
+    font-size: 16px;
+    transition: background-color var(--transition-speed) ease, transform 0.2s ease, box-shadow var(--transition-speed) ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-speed) ease;
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+}
+
+button:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+button:hover {
+    background-color: var(--btn-hover-bg);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+/* GitHub按钮特定样式 */
+.github-btn {
+    background-color: var(--github-btn-bg);
+}
+
+.github-btn:hover {
+    background-color: var(--github-btn-hover-bg);
+}
+
+/* 亮色模式 */
+body.light-mode {
+    background-color: var(--light-bg);
+    color: var(--light-text);
+}
+
+body.light-mode .background {
+    background: linear-gradient(-45deg, #e0e0e0, #cccccc, #e0e0e0, #cccccc);
+}
+
+body.light-mode .container {
+    background: var(--card-bg-light);
+    box-shadow: var(--card-shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body.light-mode button {
+    background-color: #e0e0e0;
+    color: #333333;
+}
+
+body.light-mode button:hover {
+    background-color: #cccccc;
+}
+
+body.light-mode h1::after {
+    background: #333333;
+}
+
+/* 卡片样式 */
+.card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--card-bg-dark);
+    border-radius: 15px;
+    box-shadow: var(--card-shadow-dark);
+    padding: 20px;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    position: relative;
+    cursor: grab;
+    transform: none;
+    transition: transform var(--transition-speed) ease;
+}
+
+.card:active {
+    cursor: grabbing;
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+}
+
+pre {
+    background-color: var(--pre-bg-dark);
+    color: var(--pre-text-dark);
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    font-size: 1em;
+    line-height: 1.5em;
+}
+
+body.light-mode pre {
+    background-color: var(--pre-bg-light);
+    color: var(--pre-text-light);
+}
+
+/* 震动动画 */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+/* 卡片拖动和拉伸样式 */
+.card {
+    position: relative;
+    user-select: none;
+}
+
+.resizer {
+    width: 15px;
+    height: 15px;
+    background: #5c683e;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    cursor: nwse-resize;
+}
+
+/* 自动归位动画 */
+.card.snap-back {
+    transition: transform 0.5s ease;
+}
+
+/* 转场覆盖层 */
+#transitionOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-bg);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    z-index: 1000;
+}
+
+#transitionOverlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 标题点击动画 */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-15px);
+    }
+    60% {
+        transform: translateY(-7px);
+    }
+}
+
+#mainTitle.animate {
+    animation: bounce 0.5s;
+}
