@@ -1,6 +1,6 @@
 MODDIR=${0%/*}
 ERROR_LOG="$MODDIR/error.log"
-
+> $ERROR_LOG
 if [ ! -s $MODDIR/utils.sh ]; then
     echo "模块不完整-缺少关键utils.sh，尝试修复..." > "$ERROR_LOG"
     URL="https://github.com/LIghtJUNction/RootManage-Module-Model/blob/UniCron/MyModule/utils.sh"
