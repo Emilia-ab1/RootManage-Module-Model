@@ -18,14 +18,26 @@
             <button id="refreshBtn">刷新文件</button>
         </div>
 
-        <div class="card" draggable="false">
+        <div class="card" data-type="status">
             <h2>模块状态</h2>
             <pre id="statusContent">加载中...</pre>
         </div>
 
-        <div class="card" draggable="false">
+        <div class="card" data-type="log">
             <h2>日志</h2>
             <pre id="logContent">加载中...</pre>
+        </div>
+
+        <!-- 添加 moduleInfo 容器 -->
+        <div id="moduleInfo"></div>
+    </div>
+
+    <!-- 全屏模态框 -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <span id="closeModal" class="close-button">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <pre id="modalBody"></pre>
         </div>
     </div>
 

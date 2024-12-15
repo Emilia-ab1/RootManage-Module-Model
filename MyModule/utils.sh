@@ -170,23 +170,28 @@ delete_empty_files() {
     local dir="$1"
     if [ -d "$dir" ]; then
         find "$dir" -type f -empty -delete
-        echo "已删除目录 $dir 中的所有空文件"
+        LOG INFO "已删除目录 $dir 中的所有空文件"
     else
-        echo "目录 $dir 不存在"
+        LOG ERROR "目录 $dir 不存在"
     fi
 }
 
 ###################################################################################
 # 应急函数---特殊函数 init初始化时使用
 remove_done_files() {
-    for dir in "$APIDIR"/*/; do
-        if [ -d "$dir" ]; then
-            done_file="${dir}done"
-            if [ -f "$done_file" ]; then
-                rm -f "$done_file" && LOG INFO "已删除文件: $done_file"
+    if [ -d "$APIDIR" ]; then
+        for dir in "$APIDIR"/*/; do
+            if [ -d "$dir" ]; then
+                done_file="${dir}/done"
+                if [ -f "$done_file" ]; then
+                    rm -f "$done_file"
+                    LOG INFO "已删除文件: $done_file"
+                fi
             fi
-        fi
-    done
+        done
+    else
+        LOG ERROR "目录 $APIDIR 不存在"
+    fi
 }
 # 判断进程数量是否合理
 get_crond_process_count() {
@@ -194,7 +199,15 @@ get_crond_process_count() {
 }
 # 避免因为某些未知原因导致cron进程创建过多
 KILL_ALL(){
-    for pid in $(pgrep -f "busybox cron"); do
+    for pid in $(pgrep -f "busybox crond"); do
+        kill $pid
+        if [ $? -eq 0 ]; then
+            echo "杀死 $pid"
+        else
+            echo "未能杀死 $pid"
+        fi
+    done
+    for pid in $(pgrep -f "crond"); do
         kill $pid
         if [ $? -eq 0 ]; then
             echo "杀死 $pid"
@@ -250,14 +263,12 @@ merge_cron() {
     fi
 }
 
-
+# 本模块启动的进程查询：
+# pgrep -f "busybox crond -b -c /data/adb/modules/UniCron/cron/crontabs"
 # DO ONE THING
 crond(){
-    # 启动 crond 返回PID
-    local _pid=$(cat $CROND_PID)
-    if [ -s "$CROND_PID" ] && [ -d "/proc/$_pid"  ];then
-        LOG INFO "Unicrond 正在运行，拒绝启动"
-        return 1
+    if pgrep -f "busybox crond -b -c $CRONTABSDIR" > /dev/null; then
+        LOG INFO "crond 已在运行，跳过启动"
     else
         busybox crond -b -c "$CRONTABSDIR" 2>>"$MODDIR/error.log"
         sleep 1  # 等待进程启动
@@ -270,8 +281,24 @@ crond(){
 
 crontab(){
     local file="$1"
-    busybox crontab -c "$CRONTABSDIR" "$file"
+    if [ -z "$file" ]; then
+        LOG ERROR "未指定 crontab 文件"
+        return 1
+    fi
+    if [ ! -f "$file" ]; then
+        LOG ERROR "crontab 文件不存在: $file"
+        return 1
+    fi
+    if busybox crontab -c "$CRONTABSDIR" "$file" ; then
+        LOG INFO "crond 配置更新成功"
+        return 0
+    else
+        LOG ERROR "crond 配置更新失败"
+        return 1
+    fi
 }
+
+
 
 stop_crond(){
     kill_processes $CROND_PID
@@ -293,7 +320,7 @@ UniCron_deamon(){
         sleep 3
         $INIT_SH
     else
-        LOG INFO "当前 crond 进程数: $crond_count"
+        LOG INFO "当前 crond 进程数: $crond_count pid: $CROND_PID"
     fi
 }
 
@@ -307,21 +334,13 @@ RUN() {
         if [ -s $UniCrond_cron ];then
             crontab "$UniCrond_cron"
             crond # 初始化的时候运行一次
-            if [ $? -eq 0 ]; then
-                LOG INFO "crond顺利启动"
-            else
-                LOG ERROR "crond初次运行失败！"  
-            fi
+
         else
             echo "* * * * * /data/adb/modules/UniCron/UniCrond.sh" > $UniCrond_cron
             echo "* * * * 1,3,5 rm -f /data/adb/modules/logs/UniCron.log" >> $UniCrond_cron
             crontab "$UniCrond_cron"
             crond # 尝试救回进程
-            if [ $? -eq 0 ]; then
-                LOG INFO "crond启动！"
-            else
-                LOG ERROR "未知错误！请重新安装模块！"  
-            fi
+
         fi
         
     else # 守护运行模式
