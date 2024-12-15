@@ -1,244 +1,194 @@
-// 页面加载动画
-window.onload = function() {
-    document.body.style.opacity = '1';
-    animateTitle();
-    initializeCards();
-};
+// 计数标题点击次数
+let titleClickCount = 0;
+let titleClickTimer = null;
 
-// 动画标题
-function animateTitle() {
-    const title = document.querySelector('h1');
-    const letters = title.textContent.split('');
-    title.textContent = '';
-    letters.forEach((letter, index) => {
-        const span = document.createElement('span');
-        span.textContent = letter;
-        span.style.opacity = '0';
-        span.style.display = 'inline-block';
-        span.style.transform = 'translateY(-20px)';
-        span.style.transition = `opacity 0.3s ease ${index * 0.05}s, transform 0.3s ease ${index * 0.05}s`;
-        title.appendChild(span);
+// 改进标题点击动画并添加多次点击跳转功能
+function enhanceTitleAnimation() {
+    const mainTitle = document.getElementById('mainTitle');
+    if (!mainTitle) return;
+
+    // 确定当前页面和目标页面
+    const currentPage = window.location.pathname.split('/').pop();
+    let targetPage = '';
+
+    if (currentPage === 'index.html' || currentPage === '') {
+        targetPage = 'UniCron.html';
+    } else if (currentPage === 'UniCron.html') {
+        targetPage = 'index.html';
+    } else {
+        // 默认目标页面
+        targetPage = 'index.html';
+    }
+
+    mainTitle.addEventListener('click', () => {
+        titleClickCount++;
+        // 添加缩放动画
+        mainTitle.style.transition = 'transform 0.3s ease';
+        mainTitle.style.transform = 'scale(1.08)';
         setTimeout(() => {
-            span.style.opacity = '1';
-            span.style.transform = 'translateY(0)';
-        }, 100);
+            mainTitle.style.transform = 'scale(1)';
+        }, 300);
+
+        // 如果在1.5秒内点击次数达到3次，跳转到目标页面
+        if (titleClickCount === 3) {
+            // 清除计时器
+            clearTimeout(titleClickTimer);
+            // 执行页面跳转，添加过渡动画
+            initiatePageTransition();
+            setTimeout(() => {
+                window.location.href = targetPage;
+            }, 500); // 与过渡动画时间一致
+            titleClickCount = 0;
+        } else {
+            // 重置计数器的计时器
+            clearTimeout(titleClickTimer);
+            titleClickTimer = setTimeout(() => {
+                titleClickCount = 0;
+            }, 1500);
+        }
     });
 }
+
+// 添加页面过渡动画
+function initiatePageTransition() {
+    const overlay = document.getElementById('transitionOverlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+// 页面加载后初始化
+window.onload = function() {
+    document.body.style.opacity = '1';
+    initializeInteractions();
+    enhanceTitleAnimation();
+    // 加载文件内容（仅在 index.html 中需要）
+    const currentPage = window.location.pathname.split('/').pop();
+    if (currentPage === 'index.html' || currentPage === '') {
+        loadFile('root', 'statusContent');
+        loadFile('UniCron.log', 'logContent');
+    }
+    // 其他初始化函数...
+};
 
 // 加载文件内容
 function loadFile(filePath, elementId) {
     fetch(filePath)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应不是OK');
+            }
+            return response.text();
+        })
         .then(data => {
-            document.getElementById(elementId).textContent = data;
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = data;
+            }
         })
         .catch(error => {
-            document.getElementById(elementId).textContent = '无法加载文件: ' + error;
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = '无法加载文件: ' + error;
+            }
         });
 }
 
-// 加载模块状态与日志文件
-loadFile('root', 'statusContent');
-loadFile('UniCron.log', 'logContent');
-
 // 切换暗色模式与亮色模式
-const toggleModeBtn = document.getElementById('toggleMode');
-toggleModeBtn.addEventListener('click', function () {
-    document.body.classList.toggle('light-mode');
-    let isLightMode = document.body.classList.contains('light-mode');
-    this.textContent = isLightMode ? '☀️' : '🌚';
-});
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleModeBtn = document.getElementById('toggleMode');
+    if (toggleModeBtn) {
+        toggleModeBtn.addEventListener('click', function () {
+            document.body.classList.toggle('light-mode');
+        });
+    }
 
-// 跳转到GitHub项目
-document.getElementById('githubBtn').addEventListener('click', function () {
-    window.open('https://github.com/LIghtJUNction/RootManage-Module-Model/releases', '_blank');
-});
+    // 跳转到GitHub项目（仅在 index.html 中需要）
+    const githubBtn = document.getElementById('githubBtn');
+    if (githubBtn) {
+        githubBtn.addEventListener('click', function () {
+            window.open('https://github.com/LIghtJUNction/RootManage-Module-Model', '_blank');
+        });
+    }
 
-// 刷新按钮与彩蛋
-let refreshCount = 0;
-document.getElementById('refreshBtn').addEventListener('click', function () {
-    loadFile('status', 'statusContent');
-    loadFile('log', 'logContent');
-
-    refreshCount++;
-    if (refreshCount >= 5) {
-        triggerEasterEgg();
-        refreshCount = 0;
+    // 刷新按钮与彩蛋（仅在 index.html 中需要）
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        let refreshCount = 0;
+        refreshBtn.addEventListener('click', function () {
+            loadFile('root', 'statusContent');
+            loadFile('UniCron.log', 'logContent');
+            refreshCount++;
+            if (refreshCount >= 5) {
+                triggerEasterEgg();
+                refreshCount = 0;
+            }
+        });
     }
 });
 
 // 彩蛋功能
 function triggerEasterEgg() {
-    const container = document.querySelector('.container');
-    const fireworks = document.createElement('div');
-    fireworks.classList.add('fireworks');
-    container.appendChild(fireworks);
-
-    setTimeout(() => {
-        container.removeChild(fireworks);
-    }, 3000);
+    // 实现彩蛋效果的代码
+    alert('🎉 彩蛋触发！');
 }
 
-// 动态创建烟花效果
-const style = document.createElement('style');
-style.innerHTML = `
-.fireworks {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.fireworks::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDYwMCA2MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTMwMCAwTDMxMCA2MCAyMDAgNjAwQzIwMCA2MDAgMzAwIDYwMCAzMDAgNjAwQzMwMCA2MDAgNjAwIDEwMDAgNjAwIDEwMDBIMzAwQzMwMCAxMDAwIDMwMCA2MDAgMzAwIDYwMEwzMDAgMDBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4K');
-    animation: explode 3s ease-out forwards;
-}
-
-@keyframes explode {
-    0% { opacity: 1; transform: scale(0.5); }
-    100% { opacity: 0; transform: scale(3); }
-}
-`;
-document.head.appendChild(style);
-
-// 初始化卡片交互
-function initializeCards() {
-    const cards = document.querySelectorAll('.card');
-
-    cards.forEach(card => {
-        // 点击震动
-        card.addEventListener('click', () => {
-            triggerShake(card);
-        });
-
-        // 拖动功能
-        makeDraggable(card);
-
-        // 拉伸功能
-        makeResizable(card);
-    });
-}
-
-// 震动动画
-function triggerShake(card) {
-    card.classList.add('shake');
-    setTimeout(() => {
-        card.classList.remove('shake');
-    }, 500);
-}
-
-// 拖动功能实现，自动归位
+// 让元素可拖动并添加果冻效果
 function makeDraggable(element) {
     let isDragging = false;
     let startX, startY;
-    let originalX = 0;
-    let originalY = 0;
+    let offsetX = 0, offsetY = 0;
 
-    element.addEventListener('mousedown', (e) => {
+    // 适配鼠标和触摸事件的坐标获取
+    const getEventX = (e) => e.type.includes('touch') ? (e.touches[0] ? e.touches[0].clientX : e.changedTouches[0].clientX) : e.clientX;
+    const getEventY = (e) => e.type.includes('touch') ? (e.touches[0] ? e.touches[0].clientY : e.changedTouches[0].clientY) : e.clientY;
+
+    const dragStart = (e) => {
         isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        originalX = 0;
-        originalY = 0;
-        element.classList.add('snap-back');
+        startX = getEventX(e) - offsetX;
+        startY = getEventY(e) - offsetY;
+        element.classList.add('dragging');
         e.preventDefault();
-    });
+    };
 
-    document.addEventListener('mousemove', (e) => {
+    const dragMove = (e) => {
         if (isDragging) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            element.style.transform = `translate(${dx}px, ${dy}px)`;
+            offsetX = getEventX(e) - startX;
+            offsetY = getEventY(e) - startY;
+            element.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(1.05)`;
         }
-    });
+    };
 
-    document.addEventListener('mouseup', () => {
+    const dragEnd = () => {
         if (isDragging) {
             isDragging = false;
-            element.style.transform = `translate(0px, 0px)`;
+            element.classList.remove('dragging');
+            // 添加果冻效果
+            element.style.transform = 'translate(0px, 0px)';
+            element.style.transition = 'transform 0.5s cubic-bezier(0.25, 1.5, 0.5, 1)';
+            setTimeout(() => {
+                element.style.transition = '';
+            }, 500);
+            offsetX = 0;
+            offsetY = 0;
         }
-    });
+    };
+
+    // 添加事件监听
+    element.addEventListener('mousedown', dragStart);
+    element.addEventListener('mousemove', dragMove);
+    document.addEventListener('mouseup', dragEnd);
+
+    element.addEventListener('touchstart', dragStart, { passive: false });
+    element.addEventListener('touchmove', dragMove, { passive: false });
+    document.addEventListener('touchend', dragEnd);
 }
 
-// 拉伸功能实现
-function makeResizable(element) {
-    const resizer = document.createElement('div');
-    resizer.classList.add('resizer');
-    element.appendChild(resizer);
-
-    let isResizing = false;
-    let startX, startY, startWidth, startHeight;
-
-    resizer.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        const rect = element.getBoundingClientRect();
-        startWidth = rect.width;
-        startHeight = rect.height;
-        document.body.style.cursor = 'nwse-resize';
-        e.preventDefault();
-        e.stopPropagation();
+// 初始化卡片和按钮的交互
+function initializeInteractions() {
+    const elements = document.querySelectorAll('.card, .btn-group button');
+    elements.forEach(element => {
+        // 拖动功能
+        makeDraggable(element);
     });
-
-    document.addEventListener('mousemove', (e) => {
-        if (isResizing) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            element.style.width = `${startWidth + dx}px`;
-            element.style.height = `${startHeight + dy}px`;
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isResizing) {
-            isResizing = false;
-            document.body.style.cursor = 'default';
-        }
-    });
-}
-
-
-// 标题点击跳转逻辑
-const mainTitle = document.getElementById('mainTitle');
-let clickCount = 0;
-const requiredClicks = 5;
-const resetTime = 2000; // 2秒内连续点击
-
-let clickTimer = null;
-
-mainTitle.addEventListener('click', () => {
-    // 添加动画类
-    mainTitle.classList.add('animate');
-    setTimeout(() => {
-        mainTitle.classList.remove('animate');
-    }, 500);
-
-    clickCount++;
-    if (clickCount === 1) {
-        clickTimer = setTimeout(() => {
-            clickCount = 0;
-        }, resetTime);
-    }
-
-    if (clickCount >= requiredClicks) {
-        clearTimeout(clickTimer);
-        clickCount = 0;
-        initiateTransition();
-    }
-});
-
-function initiateTransition() {
-    const overlay = document.getElementById('transitionOverlay');
-    overlay.classList.add('active');
-    setTimeout(() => {
-        window.location.href = 'game.html';
-    }, 500); // 与CSS中的transition时间一致
 }

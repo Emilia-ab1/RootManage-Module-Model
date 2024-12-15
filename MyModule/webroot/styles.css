@@ -1,8 +1,15 @@
+/* 重置样式，确保没有默认的外边距和填充 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 /* CSS变量定义 */
 :root {
     --transition-speed: 0.5s;
     --dark-bg: #121212;
-    --dark-text: #aacfa3;
+    --dark-text: #ffffff;
     --light-bg: #f0f0f0;
     --light-text: #333333;
     --btn-bg: #1f1f1f;
@@ -18,26 +25,29 @@
     --card-bg-light: rgba(255, 255, 255, 0.8);
     --card-shadow-dark: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     --card-shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-    --fireworks-color: #ff4081;
+}
+
+/* 确保html和body占满整个视口 */
+html, body {
+    height: 100%;
+    width: 100%;
 }
 
 /* 基础样式 */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: var(--dark-bg);
     color: var(--dark-text);
     transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-    opacity: 0;
-    transition: opacity var(--transition-speed) ease;
-    overflow: hidden;
+    overflow-x: hidden;
     position: relative;
 }
 
 /* 背景效果 */
 .background {
     position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background: linear-gradient(-45deg, #1f1f1f, #2b2d2b, #1f1f1f, #2b2d2b);
@@ -56,13 +66,12 @@ body {
 /* 容器样式 */
 .container {
     max-width: 1000px;
-    margin: 50px auto;
-    padding: 30px;
+    margin: 20px auto;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    transition: background var(--transition-speed) ease;
 }
 
 /* 标题样式 */
@@ -72,6 +81,13 @@ h1 {
     font-size: 2.8em;
     color: inherit;
     position: relative;
+    user-select: none;
+    cursor: pointer;
+    transition: transform 0.6s ease;
+}
+
+h1:active {
+    transform: scale(1.05);
 }
 
 h1::after {
@@ -106,6 +122,7 @@ button {
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     position: relative;
     overflow: hidden;
+    touch-action: none; /* 防止拖动时屏幕滚动 */
 }
 
 button::before {
@@ -129,6 +146,15 @@ button:hover {
     background-color: var(--btn-hover-bg);
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.button-dragging {
+    transition: transform 0.1s ease;
 }
 
 /* GitHub按钮特定样式 */
@@ -177,15 +203,20 @@ body.light-mode h1::after {
     border-radius: 15px;
     box-shadow: var(--card-shadow-dark);
     padding: 20px;
-    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     position: relative;
     cursor: grab;
+    user-select: none;
     transform: none;
-    transition: transform var(--transition-speed) ease;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    touch-action: none; /* 防止拖动时屏幕滚动 */
 }
 
 .card:active {
     cursor: grabbing;
+}
+
+.card.dragging {
+    transition: transform 0.1s ease;
 }
 
 .card h2 {
@@ -211,45 +242,26 @@ body.light-mode pre {
     color: var(--pre-text-light);
 }
 
-/* 震动动画 */
-@keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
-}
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .card {
+        width: 90%;
+    }
 
-.shake {
-    animation: shake 0.5s;
-}
+    /* 调整标题和按钮的大小 */
+    h1 {
+        font-size: 2em;
+    }
 
-/* 卡片拖动和拉伸样式 */
-.card {
-    position: relative;
-    user-select: none;
-}
+    button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
 
-.resizer {
-    width: 15px;
-    height: 15px;
-    background: #5c683e;
-    border-radius: 50%;
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
-    cursor: nwse-resize;
-}
-
-/* 自动归位动画 */
-.card.snap-back {
-    transition: transform 0.5s ease;
+    .container {
+        padding: 10px;
+        margin: 10px auto;
+    }
 }
 
 /* 转场覆盖层 */
@@ -269,21 +281,4 @@ body.light-mode pre {
 #transitionOverlay.active {
     opacity: 1;
     visibility: visible;
-}
-
-/* 标题点击动画 */
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-15px);
-    }
-    60% {
-        transform: translateY(-7px);
-    }
-}
-
-#mainTitle.animate {
-    animation: bounce 0.5s;
 }

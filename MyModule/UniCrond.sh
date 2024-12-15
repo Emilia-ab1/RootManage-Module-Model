@@ -80,7 +80,7 @@ if [ $? -eq 1 ]; then
     RUN # 发生更新！
 #else # 无需更新
 fi
-sleep 50
+sleep 49
 
 UniCron_deamon
 
