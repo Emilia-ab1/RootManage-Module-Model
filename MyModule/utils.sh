@@ -257,11 +257,15 @@ crond(){
     local _pid=$(cat $CROND_PID)
     if [ -d "/proc/$_pid"  ];then
         LOG INFO "Unicrond 正在运行，拒绝启动"
+        return 1
+    else
+        busybox crond -b -c "$CRONTABSDIR" 2>>"$MODDIR/error.log"
+        sleep 1  # 等待进程启动
+        pid=$(pgrep -f "busybox crond -b -c $CRONTABSDIR" | head -n 1)
+        echo "$pid" > "$CROND_PID"
+        return 0
     fi
-    busybox crond -b -c "$CRONTABSDIR" 2>>"$MODDIR/error.log"
-    sleep 1  # 等待进程启动
-    pid=$(pgrep -f "busybox crond -b -c $CRONTABSDIR" | head -n 1)
-    echo "$pid" > "$CROND_PID"
+
 }
 
 crontab(){

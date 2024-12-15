@@ -26,7 +26,8 @@ fi
 # 确保符号链接存在
 ln -sf "$MODULE_LOG" "$WEBROOT/UniCron.log"
 ln -sf "$CRONTABSDIR/root" "$WEBROOT/root"
-echo "确保符号链接：$MODULE_LOG -> $WEBROOT/UniCron.log 和 $CRONTABSDIR/root -> $WEBROOT/root" >> $INIT_LOG
+ln -sf "$MODDIR/module.prop" "$WEBROOT/module.prop"
+echo "符号链接：$MODULE_LOG -> $WEBROOT/UniCron.log 和 $CRONTABSDIR/root -> $WEBROOT/root 和 $MODDIR/module.prop -> $WEBROOT/module.prop" >> $INIT_LOG
 
 if [ -f $MODDIR/disable ]; then #虽然被禁用的情况下 service.sh不会运行 init不会运行 。在直接运行这个脚本时，这个检查有用
     echo "检测到本模块被禁用，终止脚本" >> $INIT_LOG
