@@ -255,7 +255,7 @@ merge_cron() {
 crond(){
     # 启动 crond 返回PID
     local _pid=$(cat $CROND_PID)
-    if [ -d "/proc/$_pid"  ];then
+    if [ -s "$CROND_PID" ] && [ -d "/proc/$_pid"  ];then
         LOG INFO "Unicrond 正在运行，拒绝启动"
         return 1
     else
