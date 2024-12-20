@@ -1,12 +1,8 @@
 # UniCron 统一定时运行器 (前置模块)
-## 版本介绍
-1.0 -- 使用 magisk/apatch/kernelsu内置busybox的applet：crond/crontab工具
-
 ## 优点
 # 使用简单
 仅需在你的模块根目录下放UniCron/moduleid.cron即可被本模块收集
 并统一管理(更新/移除/禁用)
-
 
 ## 快速使用，查看示例模块
 本项目的MagicNet分支
