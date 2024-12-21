@@ -54,12 +54,14 @@ jobs:
           - name: Setup Package Config
             working-directory: Sub-Store/backend/dist
             run: |
+              pwd
+              ls -la
               echo '{
                 "name": "magicsub",
+                "main": "sub-store.bundle.js",
                 "bin": "sub-store.bundle.js",
                 "pkg": {
                   "assets": [
-                    "dist/**/*",
                     "public/**/*"
                   ],
                   "targets": [
@@ -67,14 +69,15 @@ jobs:
                   ]
                 }
               }' > package.json
+              cat package.json
               
           # 打包成二进制  
           - name: Package Binary 
             working-directory: Sub-Store/backend/dist
             run: |
-              pkg . \
-                --targets node18-android-arm64 \
-                --output MagicSub
+              pwd
+              ls -la
+              pkg . --target node18-android-arm64 --output MagicSub
               
               mkdir -p ../../MyModule/system/bin
               mv MagicSub ../../MyModule/system/bin/
