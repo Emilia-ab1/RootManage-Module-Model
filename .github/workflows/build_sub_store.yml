@@ -15,7 +15,7 @@ jobs:
              python-version: '3.10'
           - uses: actions/setup-node@v3
             with:
-              node-version: '16'
+              node-version: '18.12'
               
           # 后端构建
           - name: Checkout Backend
@@ -49,6 +49,22 @@ jobs:
             run: |
               mkdir -p Sub-Store/backend/dist/public
               cp -r Sub-Store-Front-End/dist/* Sub-Store/backend/dist/public/
+              
+          # 配置打包环境
+          - name: Setup Package Config
+            run: |
+              echo '{
+                "name": "magicsub",
+                "bin": "sub-store.bundle.js",
+                "pkg": {
+                  "assets": [
+                    "dist/**/*"
+                  ],
+                  "targets": [
+                    "node18-android-arm64"
+                  ]
+                }
+              }' > Sub-Store/backend/dist/package.json
               
           # 打包成二进制  
           - name: Package Binary
