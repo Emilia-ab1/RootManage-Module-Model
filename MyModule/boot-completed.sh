@@ -26,7 +26,4 @@
 # 注意这个sh文件是ksu新增的,因此不支持magisk(apu的系统模块功能借鉴的ksu)
 
 MODDIR=${0%/*}
-source $MODDIR/tools # 导入工具函数
 
-create_tun
-mihomo_run

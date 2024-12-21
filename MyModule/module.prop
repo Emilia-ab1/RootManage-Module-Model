@@ -1,7 +1,7 @@
-id=MagicNet
-name=MagicNet
+id=MagicSub
+name=MagicSub
 version=0.0.2
 versionCode=20241026
 author=LIghtJUNction
-description=mihomo内核_ksu模块
+description=MagicNetV1.0依赖模块-订阅管理者
 updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/MagicNet/update.json
