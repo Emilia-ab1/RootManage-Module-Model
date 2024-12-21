@@ -68,15 +68,16 @@ jobs:
               
           # 打包成二进制  
           - name: Package Binary
+            working-directory: Sub-Store/backend/dist
             run: |
-              pkg Sub-Store/backend/dist/sub-store.bundle.js \
-                --config package.json \
-                --targets node16-android-arm64 \
-                --output MagicSub
-              mkdir -p MyModule/system/bin
-              mv MagicSub MyModule/system/bin/MagicSub
+              pkg --config package.json \
+                  sub-store.bundle.js \
+                  --targets node18-android-arm64 \
+                  --output MagicSub
+              mkdir -p ../../MyModule/system/bin
+              mv MagicSub ../../MyModule/system/bin/
 
-
+              
           - name: Upload Artifact
             uses: actions/upload-artifact@v3
             with:
