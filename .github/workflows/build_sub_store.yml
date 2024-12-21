@@ -52,32 +52,34 @@ jobs:
               
           # 配置打包环境
           - name: Setup Package Config
+            working-directory: Sub-Store/backend/dist
             run: |
               echo '{
                 "name": "magicsub",
                 "bin": "sub-store.bundle.js",
                 "pkg": {
                   "assets": [
-                    "dist/**/*"
+                    "dist/**/*",
+                    "public/**/*"
                   ],
                   "targets": [
                     "node18-android-arm64"
                   ]
                 }
-              }' > Sub-Store/backend/dist/package.json
+              }' > package.json
               
           # 打包成二进制  
-          - name: Package Binary
+          - name: Package Binary 
             working-directory: Sub-Store/backend/dist
             run: |
-              pkg --config package.json \
-                  sub-store.bundle.js \
-                  --targets node18-android-arm64 \
-                  --output MagicSub
+              pkg . \
+                --targets node18-android-arm64 \
+                --output MagicSub
+              
               mkdir -p ../../MyModule/system/bin
               mv MagicSub ../../MyModule/system/bin/
 
-              
+
           - name: Upload Artifact
             uses: actions/upload-artifact@v3
             with:
