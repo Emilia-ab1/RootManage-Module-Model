@@ -1,5 +1,5 @@
 # MagicNet
-[查看模块](https://github.com/LIghtJUNction/RootManage-Module-Model/blob/MagicNet/MyModule/README.MD#%E5%AF%B9%E6%AF%94%E6%88%91%E7%9A%84bfm_config%E9%A1%B9%E7%9B%AE%E4%B8%BB%E8%A6%81%E6%94%B9%E5%8A%A8)
+
 ![image](https://github.com/user-attachments/assets/f46c5c92-27df-4edd-851d-cae77ebd8540)
 
 在安卓设备启用 tun 模式其实很简单 😊  
@@ -7,7 +7,7 @@ It's actually quite simple to enable tun mode on Android devices.
 
 一个尽可能精简，希望每个人都能看懂的模块。  
 A module that's as streamlined as possible, and easy for everyone to understand.
-
+[查看模块](https://github.com/LIghtJUNction/RootManage-Module-Model/blob/MagicNet/MyModule/README.MD#%E5%AF%B9%E6%AF%94%E6%88%91%E7%9A%84bfm_config%E9%A1%B9%E7%9B%AE%E4%B8%BB%E8%A6%81%E6%94%B9%E5%8A%A8)
 ## Features ✨
 
 - **安卓设备使用 tun 模式**  
