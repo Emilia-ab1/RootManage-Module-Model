@@ -1,7 +1,7 @@
 id=UniTimecron
 name=UniTimecron
-version=UniTimecron-0.5
-versionCode=20241212
+version=UniTimecron-0.5_fix
+versionCode=20241224
 author=LIghtJUNction
 description=timecron+ksu/webui = UniTimecron，默认密码admin
 updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniTimecron/update.json

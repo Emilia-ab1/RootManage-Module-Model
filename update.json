@@ -1,6 +1,7 @@
 {
-  "version": "0.0.0",
-  "versionCode": "20241212",
-  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/0.0.0/UniTimecron-0.0.0-20241212-byLIghtJUNction.zip",
-  "changelog": "https://github.com/LIghtJUNction/RootManage-Module-Model/raw/UniTimecron/CHANGELOG.md"
+  "version": "UniTimecron-0.5_fix",
+  "versionCode": "20241224",
+  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/UniTimecron-0.5_fix/UniTimecron-UniTimecron-0.5_fix-20241224-byLIghtJUNction.zip",
+  "changelog": "https://github.com/LIghtJUNction/RootManage-Module-Model/UniTimecron/CHANGELOG.md",
+  "description": "timecron+ksu/webui "
 }
