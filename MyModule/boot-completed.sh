@@ -26,7 +26,13 @@
 # 注意这个sh文件是ksu新增的,因此不支持magisk(apu的系统模块功能借鉴的ksu)
 
 MODDIR=${0%/*}
-source $MODDIR/tools # 导入工具函数
+source $MODDIR/utils.sh # 导入工具函数
+
+if [ -f $LOG_FILE ]; then
+    rm -f $LOG_FILE # 每次重启清空日志
+fi
+
+# 运行mihomo内核
 
 create_tun
 mihomo_run
