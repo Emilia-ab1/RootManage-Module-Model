@@ -61,8 +61,8 @@ create_tun() {
 mihomo_run() {
     if [ -x "${mihomo}" ]; then
         # 启动 mihomo 内核，并将日志记录到指定文件
+        "${mihomo}" -d "${mihomo_dir}" -f "${mihomo_config}" >> "${LOG_FILE}" 2>&1 &
         set_module_description "mihomo启动!🛡️[内核启动时间🕓]-$(date '+%Y-%m-%d %H:%M:%S') [mihomo]-$(${mihomo} -v | tr -d '\n') 请注意查看日志!"
-        "${mihomo}" -d "${mihomo_dir}" -f "${mihomo_config}" >> "${LOG_FILE}" 2>&1
     else
         log Error "未找到或不可执行的 ${mihomo}"
         exit 1
