@@ -1,4 +1,4 @@
-# MagicNet
+# MagicNet -- MagicSub(运行sub_store配合MagicNet使用)
 
 ![image](https://github.com/user-attachments/assets/f46c5c92-27df-4edd-851d-cae77ebd8540)
 
