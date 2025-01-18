@@ -3,10 +3,4 @@
 MODDIR=${0%/*}
 source $MODDIR/tools # 导入工具函数
 
-if [ -f $MODDIR/init ];then
-  set_module_description "引导模式-请前往data/adb/modules/MagicNet/env填写订阅链接"
-  init
-else
-  echo "* 0 * * * data/adb/modules/MagicNet.sh" > $MODDIR/UniCron/MagicNet.cron
-  update
-fi
+# 施工中

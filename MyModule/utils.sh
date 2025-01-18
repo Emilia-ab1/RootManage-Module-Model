@@ -13,6 +13,7 @@ green="\033[1;32m"
 yellow="\033[1;33m"
 blue="\033[1;34m"
 
+config_file="magicnet.yaml"
 
 set_module_description(){
     local new_description="$1"
