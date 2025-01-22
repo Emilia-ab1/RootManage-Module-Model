@@ -12,8 +12,6 @@ proxy-providers:
       url: http://www.gstatic.com/generate_204
       interval: 3600
 
-      
-
 # 代理提供者在上############################################
 
 # 配置组一             端口类

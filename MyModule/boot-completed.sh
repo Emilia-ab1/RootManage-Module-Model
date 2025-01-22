@@ -28,6 +28,17 @@
 MODDIR=${0%/*}
 source $MODDIR/utils.sh # 导入工具函数
 
+if [ -f $MODDIR/magisk ]; then
+    echo "检测到 Magisk，等待系统开机完毕..."
+
+    # 等待系统开机完毕
+    while [ "$(getprop sys.boot_completed)" != "1" ]; do
+        sleep 1
+    done
+
+    echo "系统已开机完毕，继续执行脚本..."
+fi
+
 if [ -f $LOG_FILE ]; then
     rm -f $LOG_FILE # 每次重启清空日志
 fi
@@ -36,3 +47,36 @@ fi
 
 create_tun
 mihomo_run
+
+if [ -f yacd ]; then
+    echo "启用yacd..."
+
+    # 使用 sed 替换 URL 链接
+    sed -i 's|http://127.0.0.1:9090/ui/|https://yacd.haishan.me/|' ./webroot/index.html
+
+    echo "URL 链接替换完成。"
+fi
+
+log INFO "脚本执行完毕"
+
+while true; do
+    sleep 30
+        # 读取配置文件中的 URL
+    url=$(yq '.proxy-providers.myclash.url' './mihomo/config.yaml')
+
+    # 检测 URL 是否可访问
+    if curl --output /dev/null --silent --head --fail "$url"; then
+        LOG INFO "链接有效"
+        break
+    else
+        LOG ERROR "链接无效"
+        LOG INFO "等待 30 秒后重试..."
+        LOG INFO "请在clickme.yaml中修改url"
+        sync_configs
+    fi
+done
+
+
+
+
+exit 0
