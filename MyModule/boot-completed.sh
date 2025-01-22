@@ -59,7 +59,7 @@ log INFO "脚本执行完毕"
 while true; do
     sleep 30
         # 读取配置文件中的 URL
-    url=$(yq '.proxy-providers.myclash.url' './mihomo/config.yaml')
+    url=$(yq '.proxy-providers.myclash.url' 'clickme.yaml')
 
     # 检测 URL 是否可访问
     if curl --output /dev/null --silent --head --fail "$url"; then
