@@ -117,7 +117,7 @@ handle_module_prop() {
     if [ ! -f "$prop_file" ]; then
         echo "错误: module.prop 文件不存在"
         return 1
-    }
+    fi
 
     case "$action" in
         "read")
