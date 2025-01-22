@@ -129,7 +129,7 @@ handle_module_prop() {
             if [ -z "$value" ]; then
                 echo "错误: 写入操作需要提供值"
                 return 1
-            }
+            fi
             # 写入值
             sed -i "s/^${key}=.*/${key}=${value}/" "$prop_file"
             ;;
