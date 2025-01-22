@@ -70,15 +70,14 @@ sleep 3
 # 以上写的非常通用
 # 可选
 start(){
-pkg="$1"
-
-if [ -n "$pkg" ];then
-  r=$(am start -d "$url" -p "$pkg" -a android.intent.action.VIEW 2>&1)
-  else
-  r=$(am start -d "$url" -a android.intent.action.VIEW 2>&1)
-  fi
-  echo "$r" | grep -q -v "Error"
-  return $?
+  pkg="$1"
+  if [ -n "$pkg" ];then
+    r=$(am start -d "$url" -p "$pkg" -a android.intent.action.VIEW 2>&1)
+    else
+    r=$(am start -d "$url" -a android.intent.action.VIEW 2>&1)
+    fi
+    echo "$r" | grep -q -v "Error"
+    return $?
 }
 
 
