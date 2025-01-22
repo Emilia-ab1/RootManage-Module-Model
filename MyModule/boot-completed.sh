@@ -64,6 +64,7 @@ while true; do
     # 检测 URL 是否可访问
     if curl --output /dev/null --silent --head --fail "$url"; then
         log INFO "链接有效"
+        sync_configs
         break
     else
         log ERROR "链接无效"
