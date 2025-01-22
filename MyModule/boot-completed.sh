@@ -36,6 +36,7 @@ elif
     # 其他的root管理器使用boot-complete.sh
     if [ -f "$MODDIR/service.sh" ]; then
         mv "$MODDIR/service.sh" "$MODDIR/boot-completed.sh"
+    fi
 fi
 
 # 函数：检查并下载 sub_store 最新版 JS 文件
@@ -89,4 +90,10 @@ check_and_download_sub_store() {
 
 # 调用函数
 check_and_download_sub_store
-node sub-store-min.js
+
+# 检查文件是否存在并运行
+if [ -f "$MODDIR/sub-store.min.js" ]; then
+    node "$MODDIR/sub-store.min.js"
+else
+    echo "sub-store.min.js 文件不存在" > readme.log
+fi
