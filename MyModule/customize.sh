@@ -73,12 +73,12 @@ start(){
 pkg="$1"
 
 if [ -n "$pkg" ];then
-r=$(am start -d "$url" -p "$pkg" -a android.intent.action.VIEW 2>&1)
-else
-r=$(am start -d "$url" -a android.intent.action.VIEW 2>&1)
-fi
-echo "$r" | grep -q -v "Error"
-return $?
+  r=$(am start -d "$url" -p "$pkg" -a android.intent.action.VIEW 2>&1)
+  else
+  r=$(am start -d "$url" -a android.intent.action.VIEW 2>&1)
+  fi
+  echo "$r" | grep -q -v "Error"
+  return $?
 }
 
 
@@ -140,7 +140,7 @@ case $(detect_key_press) in
     ;;
   2)
     ui_print " 不启用sub_store，请手动填写url "
-    rm -f $MODPATH/
+    rm -f $MODPATH/magic_sub || ui_print "好的，不使用magic_sub"
     
 esac
 

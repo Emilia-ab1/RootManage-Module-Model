@@ -30,7 +30,9 @@ source $MODDIR/utils.sh # 导入工具函数
 
 if [ -f $MODDIR/magisk ]; then
     echo "检测到 Magisk，等待系统开机完毕..."
-
+    if [ -f $MODDIR/boot_completed.sh ]; then
+        mv $MODDIR/boot_completed.sh $MODDIR/service.sh
+    fi
     # 等待系统开机完毕
     while [ "$(getprop sys.boot_completed)" != "1" ]; do
         sleep 1
