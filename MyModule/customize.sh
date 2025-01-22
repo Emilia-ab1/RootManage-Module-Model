@@ -44,13 +44,17 @@ ui_print "Android API 版本: $API"
 
 if [ "$KSU" = "true" ]; then
   ui_print "- kernelSU version: $KSU_VER ($KSU_VER_CODE)"
+  echo "$KSU_VER" > $MODPATH/ksu
 elif [ "$APATCH" = "true" ]; then
   APATCH_VER=$(cat "/data/adb/ap/version")
   ui_print "- APatch version: $APATCH_VER"
   ui_print "- KERNEL_VERSION: $KERNEL_VERSION"
   ui_print "- KERNELPATCH_VERSION: $KERNELPATCH_VERSION"
+  echo "$APATCH_VER" > $MODPATH/apatch
 else
   ui_print "- Magisk version: $MAGISK_VER ($MAGISK_VER_CODE)"
+  echo "$MAGISK_VER" > $MODPATH/magisk
+  mv $MODPATH/boot-complete.sh $MODPATH/service.sh
 fi
 
 
@@ -67,3 +71,4 @@ ui_print "安装完成"
 
 # 设置权限
 set_perm_recursive $MODPATH 0 0 0755 0755
+
