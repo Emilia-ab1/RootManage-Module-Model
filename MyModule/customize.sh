@@ -113,7 +113,7 @@ detect_key_press() {
   done
 }
 
-echo "跳转GitHub仓库给作者一个star（音量+）；取消跳转（音量-）--默认跳转"
+ui_print "跳转GitHub仓库给作者一个star（音量+）；取消跳转（音量-）--默认跳转"
 case $(detect_key_press) in
   0)
     ui_print "- No input detected after 10 seconds -- 10秒后没有输入_默认跳转"
@@ -128,7 +128,7 @@ case $(detect_key_press) in
     ;;
 esac
 
-echo "是否使用sub_store模块?（音量+）；否（音量-）--默认否"
+ui_print "是否使用sub_store模块?（音量+）；否（音量-）--默认否"
 case $(detect_key_press) in
   0)
     ui_print " 超时-不启用sub_store "
