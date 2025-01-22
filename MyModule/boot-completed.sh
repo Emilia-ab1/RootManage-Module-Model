@@ -43,10 +43,7 @@ if [ -f $LOG_FILE ]; then
     rm -f $LOG_FILE # 每次重启清空日志
 fi
 
-# 运行mihomo内核
 
-create_tun
-mihomo_run
 
 if [ -f yacd ]; then
     echo "启用yacd..."
@@ -76,7 +73,10 @@ while true; do
     fi
 done
 
+# 运行mihomo内核
 
+create_tun
+mihomo_run
 
 
 exit 0
