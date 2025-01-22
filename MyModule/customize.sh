@@ -159,9 +159,14 @@ case $(detect_key_press) in
     ;;
 esac
 
-
 # 设置文件权限
 set_perm_recursive $MODPATH 0 0 0755 0755
 ui_print "感谢使用！关注我的公众号/加入我的qq群/关注我的酷安号：LIghtJUNction/以获取支持!"
 
 ui_print "安装完成"
+
+ui_print "现在你可以直接去模块目录/clickme.yaml修改配置文件，填写订阅链接，然后重启即可"
+
+# 鸣谢
+
+

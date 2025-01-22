@@ -29,8 +29,8 @@ log() {
     [ ! -f "${LOG_FILE}" ] && touch "${LOG_FILE}" && chmod 600 "${LOG_FILE}"
     case $1 in
         INFO) color="${blue}" ;;
-        Error) color="${red}" ;;
-        Warning) color="${yellow}" ;;
+        ERROR) color="${red}" ;;
+        WARNING) color="${yellow}" ;;
         *) color="${green}" ;;
     esac
     current_time=$(formatted_date)
@@ -50,13 +50,12 @@ create_tun() {
     log INFO "创建/dev/net/tun符号链接"
     
     if [ ! -c "/dev/net/tun" ]; then
-        log Error "无法创建 /dev/net/tun，可能的原因："
-        log Warning "系统不支持 TUN/TAP 驱动或内核不兼容"
+        log ERROR "无法创建 /dev/net/tun，可能的原因："
+        log WARNING "系统不支持 TUN/TAP 驱动或内核不兼容"
         exit 1
     fi
     log INFO "/dev/net/tun 为字符设备，检查通过"
 }
-
 
 
 mihomo_run() {
@@ -65,7 +64,7 @@ mihomo_run() {
         "${mihomo}" -d "${mihomo_dir}" -f "${mihomo_config}" >> "${LOG_FILE}" 2>&1 &
         set_module_description "mihomo启动!🛡️[内核启动时间🕓]-$(date '+%Y-%m-%d %H:%M:%S') [mihomo]-$(${mihomo} -v | tr -d '\n') 请注意查看日志!"
     else
-        log Error "未找到或不可执行的 ${mihomo}"
+        log ERROR "未找到或不可执行的 ${mihomo}"
         exit 1
     fi
 }
