@@ -40,7 +40,7 @@ if [ -f $MODDIR/magisk ]; then
 fi
 
 if [ -f $LOG_FILE ]; then
-    rm -f $LOG_FILE # 每次重启清空日志
+    echo > $LOG_FILE # 每次重启清空日志
 fi
 
 
