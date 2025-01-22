@@ -71,5 +71,6 @@ mihomo_run() {
 
 sync_config() {
     # 执行同步脚本
-    ${MODDIR}/sync_configs.sh || echo "同步失败!!!!!!!!!!!!!!!!!!!!!!!!!" >> "${LOG_FILE}"
+    sh $MODDIR/sync_configs.sh || sleep 10 && sh $MODDIR/sync_configs.sh || log ERROR "同步配置文件失败!!!!" 
+
 }
