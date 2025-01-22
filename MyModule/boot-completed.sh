@@ -64,13 +64,13 @@ while true; do
     # 检测 URL 是否可访问
     if curl --output /dev/null --silent --head --fail "$url"; then
         log INFO "链接有效"
-        sync_configs
+        sync_config
         break
     else
         log ERROR "链接无效"
         log INFO "等待 30 秒后重试..."
         log INFO "请在clickme.yaml中修改url"
-        sync_configs
+        sync_config
     fi
 done
 
