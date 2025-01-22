@@ -1,6 +1,6 @@
 #!/bin/bash
 MODDIR=${0%/*}
-source $MODDIR/tools # 导入工具函数
+source $MODDIR/utils.sh # 导入工具函数
 
 SOURCE_FILE="$MODDIR/clickme.yaml"
 TARGET_FILE="$MODDIR/mihomo/config.yaml"
