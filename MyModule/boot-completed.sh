@@ -37,8 +37,6 @@ if [ -f $MODDIR/magisk ]; then
     while [ "$(getprop sys.boot_completed)" != "1" ]; do
         sleep 1
     done
-
-    echo "系统已开机完毕，继续执行脚本..."
 fi
 
 if [ -f $LOG_FILE ]; then
@@ -48,12 +46,12 @@ fi
 
 
 if [ -f yacd ]; then
-    echo "启用yacd..."
-
+    log INFO "使用yacd"
     # 使用 sed 替换 URL 链接
-    sed -i 's|http://127.0.0.1:9090/ui/|https://yacd.haishan.me/|' ./webroot/index.html
-
-    echo "URL 链接替换完成。"
+    sed -i 's|http://127.0.0.1:9090/ui/|https://yacd.haishan.me/|' ./webroot/index.html || log ERROR "替换 URL 链接失败。"
+else
+    log INFO "使用默认前端"
+    sed -i 's|https://yacd.haishan.me/|http://127.0.0.1:9090/ui/|' ./webroot/index.html || log ERROR "替换 URL 链接失败。"
 fi
 
 log INFO "脚本执行完毕"
@@ -65,12 +63,12 @@ while true; do
 
     # 检测 URL 是否可访问
     if curl --output /dev/null --silent --head --fail "$url"; then
-        LOG INFO "链接有效"
+        log INFO "链接有效"
         break
     else
-        LOG ERROR "链接无效"
-        LOG INFO "等待 30 秒后重试..."
-        LOG INFO "请在clickme.yaml中修改url"
+        log ERROR "链接无效"
+        log INFO "等待 30 秒后重试..."
+        log INFO "请在clickme.yaml中修改url"
         sync_configs
     fi
 done
