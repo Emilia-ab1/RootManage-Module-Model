@@ -32,7 +32,7 @@ if [ -f "$MODDIR/magisk" ]; then
     while [ "$(getprop sys.boot_completed)" != "1" ]; do
         sleep 1
     done
-elif
+else
     # 其他的root管理器使用boot-complete.sh
     if [ -f "$MODDIR/service.sh" ]; then
         mv "$MODDIR/service.sh" "$MODDIR/boot-completed.sh"
@@ -43,9 +43,9 @@ fi
 check_and_download_sub_store() {
     local github_repo="sub-store-org/Sub-Store"
     local official_url="https://api.github.com/repos/${github_repo}/releases/latest"
-    local proxy_url="https://mirror.ghproxy.com/https://github.com/${github_repo}/releases/latest/download/sub-store.min.js"
+    local proxy_url="https://mirror.ghproxy.com/https://github.com/${github_repo}/releases/latest/download/sub-store.bundle.js"
     local version_file="$MODDIR/version"
-    local js_file="$MODDIR/sub-store.min.js"
+    local js_file="$MODDIR/sub-store.bundle.js"
     local latest_version
     local download_url
 
@@ -68,11 +68,11 @@ check_and_download_sub_store() {
     fi
 
     # 比较版本号，如果不同则下载最新版本
-    if [ "$latest_version" != "$current_version" ]; then
-        echo "检测到新版本：$latest_version，开始下载..."
+    if [ "$latest_version" != "$current_version" ] || [ ! -f "$js_file" ]; then
+        echo "检测到新版本或文件不存在：$latest_version，开始下载..."
 
         # 尝试从 GitHub 直接下载
-        if ! curl -L -o "$js_file" "https://github.com/${github_repo}/releases/download/${latest_version}/sub-store.min.js"; then
+        if ! curl -L -o "$js_file" "https://github.com/${github_repo}/releases/download/${latest_version}/sub-store.bundle.js"; then
             echo "从 GitHub 下载失败，尝试从代理链接下载..."
             if ! curl -L -o "$js_file" "$proxy_url"; then
                 echo "从代理链接下载失败" > readme.log
@@ -88,12 +88,119 @@ check_and_download_sub_store() {
     fi
 }
 
+# 函数：检查端口是否被占用
+check_port() {
+    local port=$1
+    if nc -z 127.0.0.1 "$port" >/dev/null 2>&1; then
+        return 1
+    fi
+    return 0
+}
+
+# 函数：检查服务是否运行
+check_service() {
+    local port=$1
+    if curl -s "http://127.0.0.1:${port}/" >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
+# 函数：操作 module.prop 文件
+handle_module_prop() {
+    local action=$1    # 操作类型：read 或 write
+    local key=$2       # 键名
+    local value=$3     # 新值（写入时使用）
+    local prop_file="$MODDIR/module.prop"
+
+    # 检查文件是否存在
+    if [ ! -f "$prop_file" ]; then
+        echo "错误: module.prop 文件不存在"
+        return 1
+    }
+
+    case "$action" in
+        "read")
+            # 读取值
+            sed -n "s/^${key}=//p" "$prop_file"
+            ;;
+        "write")
+            # 检查是否提供了值
+            if [ -z "$value" ]; then
+                echo "错误: 写入操作需要提供值"
+                return 1
+            }
+            # 写入值
+            sed -i "s/^${key}=.*/${key}=${value}/" "$prop_file"
+            ;;
+        *)
+            echo "错误: 无效的操作类型，请使用 read 或 write"
+            return 1
+            ;;
+    esac
+}
+
+# 使用示例：
+# 读取版本
+# version=$(handle_module_prop "read" "version")
+# 
+# 修改版本
+# handle_module_prop "write" "version" "1.0.0"
+# main
+
 # 调用函数
 check_and_download_sub_store
 
-# 检查文件是否存在并运行
-if [ -f "$MODDIR/sub-store.min.js" ]; then
-    node "$MODDIR/sub-store.min.js"
-else
-    echo "sub-store.min.js 文件不存在" > readme.log
+# 检查 node 是否安装
+if ! command -v node >/dev/null 2>&1; then
+    echo "未找到 node 命令，请安装 Node.js" > "$MODDIR/readme.log"
+    exit 1
 fi
+
+
+
+# 设置 Sub-Store 服务配置
+# 好像没用 默认3000端口
+HOST="127.0.0.1"
+PORT="3000"
+MAX_PORT="3010"  # 最大尝试端口号
+
+# 检查文件是否存在并运行
+if [ -f "$MODDIR/sub-store.bundle.js" ]; then
+    current_port=$PORT
+    while [ "$current_port" -le "$MAX_PORT" ]; do
+        if check_port "$current_port"; then
+            PORT=$current_port
+            break
+        fi
+        current_port=$((current_port + 1))
+    done
+
+    if [ "$current_port" -gt "$MAX_PORT" ]; then
+        echo "未找到可用端口 (3000-3010)" > "$MODDIR/readme.log"
+        exit 1
+    fi
+    # 这个...
+    SUB_STORE_HOST="$HOST" SUB_STORE_PORT="$PORT"
+    # 后台运行服务
+    node "$MODDIR/sub-store.bundle.js" >> "$MODDIR/sub-store.log" 2>&1 &
+
+    # 记录进程 ID
+    echo $! > "$MODDIR/sub-store.pid"
+    
+    # 等待服务启动
+    sleep 2
+    
+    # 检查服务是否成功启动
+    if check_service "$PORT"; then
+        echo "Sub-Store 服务已启动于 http://${HOST}:${PORT}" > "$MODDIR/readme.log"
+        handle_module_prop "write" "desciption" "Sub-Store 服务已启动于 http://${HOST}:${PORT}"
+    else
+        echo "Sub-Store 服务启动失败" > "$MODDIR/readme.log"
+        handle_module_prop "write" "desciption" "Sub-Store 服务启动失败"
+        exit 1
+    fi
+else
+    echo "sub-store.bundle.js 文件不存在" > "$MODDIR/readme.log"
+fi
+
