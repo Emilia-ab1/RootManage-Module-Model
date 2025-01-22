@@ -69,4 +69,7 @@ mihomo_run() {
     fi
 }
 
-
+sync_config() {
+    # 执行同步脚本
+    ${MODDIR}/sync_config.sh || echo "同步失败!!!!!!!!!!!!!!!!!!!!!!!!!" >> "${LOG_FILE}"
+}
