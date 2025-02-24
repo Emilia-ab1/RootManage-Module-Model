@@ -1,4 +1,4 @@
-#  customize.sh 脚本说明
+#  c:stomize.sh 脚本说明
 #
 # 脚本功能：
 # 1. 打印自定义安装过程的开始信息。
@@ -16,8 +16,18 @@
 # - set_perm_recursive: 递归设置目录及其内容的权限。
 
 ui_print "欢迎使用本前置模块"
-ui_print "版本3.0"
+ui_print "版本4.0"
 ui_print "作者：@LIghtJUNction"
 ui_print "github：https://github.com/LIghtJUNction/RootManage-Module-Model/blob/UniCron"
 
-set_perm_recursive $MODPATH 0 0 0755 0755
+mkdir -p $MODPATH/system/bin
+mkdir -p $MODPATH/cron.d
+mkdir -p $MODPATH/spool
+mkdir -p $MODPATH/etc
+
+set_perm_recursive $MODPATH/system/bin 0 0 0755 0755
+set_perm_recursive $MODPATH/cron.d 0 0 0755 0644
+
+set_perm_recursive $MODPATH/spool 0 0 0755 0644
+set_perm_recursive $MODPATH/etc 0 0 0755 0644
+

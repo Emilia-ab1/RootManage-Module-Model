@@ -1,7 +1,7 @@
 id=UniCron
 name=UniCron
-version=UniCron-3.0
+version=UniCron-4.0
 versionCode=20241220
 author=LIghtJUNction
-description=UniCron-统一Cron前置模块
+description=UniCron-统一Cron前置模块--使用最新cronie构建
 updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniCron/update.json
