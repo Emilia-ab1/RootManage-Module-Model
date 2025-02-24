@@ -5,4 +5,4 @@ $MODDIR/service.sh
 
 unicrontab -l
 
-ui_print "刷新完成"
+echo "刷新完成"

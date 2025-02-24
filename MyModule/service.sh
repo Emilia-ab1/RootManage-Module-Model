@@ -36,7 +36,7 @@ done
 
 # 如果发现有配置文件，则更新 crontab
 if [ -s "$TEMP_CRON" ]; then
-    unicrontab "$TEMP_CRON"
+    unicrontab -c $CONFIGDIR "$TEMP_CRON"
 fi
 
 # 清理临时文件
