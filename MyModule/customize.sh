@@ -25,6 +25,7 @@ mkdir -p $MODPATH/cron.d
 mkdir -p $MODPATH/spool
 mkdir -p $MODPATH/etc
 
+set_perm_recursive $MODPATH 0 0 0755 0755
 set_perm_recursive $MODPATH/system/bin 0 0 0755 0755
 set_perm_recursive $MODPATH/cron.d 0 0 0755 0644
 
