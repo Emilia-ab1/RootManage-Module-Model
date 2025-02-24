@@ -1,7 +1,7 @@
 {
-  "version": "UniCron-3.0",
-  "versionCode": "20241220",
-  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/UniCron-3.0/UniCron-UniCron-3.0-20241220-byLIghtJUNction.zip",
+  "version": "4.0",
+  "versionCode": "20250224",
+  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/4.0/UniCron-4.0-20250224-byLIghtJUNction.zip",
   "changelog": "https://github.com/LIghtJUNction/RootManage-Module-Model/UniCron/CHANGELOG.md",
-  "description": "UniCron-统一Cron前置模块"
+  "description": "UniCron-统一Cron前置模块--使用最新cronie构建"
 }
