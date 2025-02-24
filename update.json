@@ -1,7 +1,7 @@
 {
-  "version": "4.1",
+  "version": "4.1.2",
   "versionCode": "20250224",
-  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/4.1/UniCron-4.1-20250224-byLIghtJUNction.zip",
+  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/4.1.2/UniCron-4.1.2-20250224-byLIghtJUNction.zip",
   "changelog": "https://github.com/LIghtJUNction/RootManage-Module-Model/UniCron/CHANGELOG.md",
   "description": "UniCron-统一Cron前置模块"
 }
