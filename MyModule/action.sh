@@ -3,6 +3,6 @@ MODDIR=${0%/*}
 
 $MODDIR/service.sh
 
-unicrontab -l
+unicrontab -c $CONFIGDIR -l
 
 echo "刷新完成"
