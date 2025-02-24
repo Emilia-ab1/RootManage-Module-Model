@@ -1,11 +1,10 @@
 # 刷新cron配置,并输出当前cron配置
 MODDIR=${0%/*}
-CRONDIR="$MODDIR/cron.d"
-SPOOLDIR="$MODDIR/spool"
-CONFIGDIR="$MODDIR/etc"
+
+SPOOLDIR="$MODDIR/webroot/spool"
+CONFIGDIR="$MODDIR/webroot/etc"
+CRON_LOG="$MODDIR/webroot/cron.log"
 
 $MODDIR/service.sh
-
-unicrontab -c $CONFIGDIR -l
 
 echo "刷新完成"

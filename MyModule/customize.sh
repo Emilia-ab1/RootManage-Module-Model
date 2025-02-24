@@ -21,14 +21,12 @@ ui_print "作者：@LIghtJUNction"
 ui_print "github：https://github.com/LIghtJUNction/RootManage-Module-Model/blob/UniCron"
 
 mkdir -p $MODPATH/system/bin
-mkdir -p $MODPATH/cron.d
-mkdir -p $MODPATH/spool
-mkdir -p $MODPATH/etc
+mkdir -p $MODPATH/webroot/spool
+mkdir -p $MODPATH/webroot/etc
 
 set_perm_recursive $MODPATH 0 0 0755 0755
 set_perm_recursive $MODPATH/system/bin 0 0 0755 0755
-set_perm_recursive $MODPATH/cron.d 0 0 0755 0644
 
-set_perm_recursive $MODPATH/spool 0 0 0755 0644
-set_perm_recursive $MODPATH/etc 0 0 0755 0644
+set_perm_recursive $MODPATH/webroot/spool 0 0 0755 0644
+set_perm_recursive $MODPATH/webroot/etc 0 0 0755 0644
 
