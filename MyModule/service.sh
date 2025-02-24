@@ -20,7 +20,7 @@ log() {
 }
 
 # 更新模块描述
-update_module_description() {
+update() {
     # 获取当前任务列表
     cron_list="$(unicrontab -l -c "$CONFIGDIR" 2>/dev/null)"
     echo "$cron_list" > "$MODDIR/webroot/cron_list"
@@ -41,6 +41,9 @@ update_module_description() {
         ' "$MODDIR/module.prop" > "$MODDIR/module.prop.new" && \
         mv "$MODDIR/module.prop.new" "$MODDIR/module.prop"
     fi
+
+    echo "{pgrep -f crond}" > "$MODDIR/webroot/crond_pid"
+    echo "{pgrep -f unicrond}" > "$MODDIR/webroot/unicrond_pid"
 }
 
 # 主要执行流程
@@ -81,7 +84,7 @@ main() {
     fi
 
     rm -f "$TEMP_CRON"
-    update_module_description
+    update
     log "配置更新完成"
 }
 

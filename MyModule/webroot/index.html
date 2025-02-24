@@ -42,6 +42,17 @@ UniCron 状态监控
             color: #666;
             font-size: 0.9em;
         }
+        .process-status {
+            display: flex;
+            gap: 20px;
+        }
+        .process-status p {
+            margin: 0;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -50,6 +61,14 @@ UniCron 状态监控
     <div class="card">
         <h2>当前时间</h2>
         <p id="currentTime"></p>
+    </div>
+
+    <div class="card">
+        <h2>进程状态</h2>
+        <div class="process-status">
+            <p>crond PID: <span id="crondPid">加载中...</span></p>
+            <p>unicrond PID: <span id="unicrondPid">加载中...</span></p>
+        </div>
     </div>
 
     <div class="card">
@@ -88,6 +107,8 @@ UniCron 状态监控
             loadFile('cronList', 'cron_list');
             loadFile('errorLog', 'error.log');
             loadFile('cronLog', 'cron.log');
+            loadFile('crondPid', 'crond_pid');
+            loadFile('unicrondPid', 'unicrond_pid');
             updateTime();
         }
 
