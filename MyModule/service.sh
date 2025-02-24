@@ -14,9 +14,11 @@ SPOOLDIR="$MODDIR/webroot/spool"
 CONFIGDIR="$MODDIR/webroot/etc"
 CRON_LOG="$MODDIR/webroot/cron.log"
 
+which busybox > busybox
+
 # 日志函数
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$ERROR_LOG"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$CRON_LOG"
 }
 
 update_pid_status() {
@@ -34,7 +36,6 @@ update_pid_status() {
 update() {
     # 获取当前任务列表
     cron_list="$(unicrontab -l -c "$CONFIGDIR" 2>/dev/null)"
-    echo "$cron_list" > "$MODDIR/webroot/cron_list"
     
     # 准备描述文本
     base_desc="UniCron-统一Cron前置模块"
@@ -54,7 +55,7 @@ update() {
     fi
 
     update_pid_status "crond" "$MODDIR/webroot/crond_pid"
-    update_pid_status "unicrond" "$MODDIR/webroot/unicrond_pid"
+    update_pid_status "crond -b -c $CONFIGDIR" "$MODDIR/webroot/unicrond_pid"
     
 }
 
