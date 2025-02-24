@@ -42,8 +42,7 @@ update() {
         mv "$MODDIR/module.prop.new" "$MODDIR/module.prop"
     fi
 
-    echo "{pgrep -f crond}" > "$MODDIR/webroot/crond_pid"
-    echo "{pgrep -f unicrond}" > "$MODDIR/webroot/unicrond_pid"
+    pgrep -f crond 2>/dev/null || echo "未运行" > "$MODDIR/webroot/crond_pid" && pgrep -f unicrond 2>/dev/null || echo "未运行" > "$MODDIR/webroot/unicrond_pid"
 }
 
 # 主要执行流程
