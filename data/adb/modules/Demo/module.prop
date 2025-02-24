@@ -1,7 +1,0 @@
-id=Demo
-name=Demo_Module
-version=999
-versionCode=20241213
-author=LIghtJUNction
-description=Demo
-updateJson=http://raw.githubusercontent.com/LIghtJUNction/RootManage-Module-Model/UniCron/update.json
