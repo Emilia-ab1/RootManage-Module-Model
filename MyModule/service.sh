@@ -21,20 +21,25 @@ log() {
 
 # 更新模块描述
 update_module_description() {
+    # 获取当前任务列表
     cron_list="$(unicrontab -l -c "$CONFIGDIR" 2>/dev/null)"
     echo "$cron_list" > "$MODDIR/webroot/cron_list"
     
+    # 准备描述文本
     base_desc="UniCron-统一Cron前置模块"
-    
     if [ -n "$cron_list" ]; then
         current_tasks=" | 当前定时任务: | $(echo "$cron_list" | tr '\n' '|')"
     else
         current_tasks=" | 当前无定时任务"
     fi
     
+    # 直接修改 description 值
     if [ -f "$MODDIR/module.prop" ]; then
-        sed "s/^description=.*/description=$base_desc$current_tasks/" "$MODDIR/module.prop" > "$MODDIR/module.prop.tmp"
-        mv "$MODDIR/module.prop.tmp" "$MODDIR/module.prop"
+        awk -v desc="$base_desc$current_tasks" '
+        /^description=/ {print "description=" desc; next}
+        {print}
+        ' "$MODDIR/module.prop" > "$MODDIR/module.prop.new" && \
+        mv "$MODDIR/module.prop.new" "$MODDIR/module.prop"
     fi
 }
 
