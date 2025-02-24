@@ -19,6 +19,17 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$ERROR_LOG"
 }
 
+update_pid_status() {
+    local name="$1"
+    local file="$2"
+    local pid=$(pgrep -f "$name" 2>/dev/null)
+    if [ -n "$pid" ]; then
+        echo "$pid" > "$file"
+    else
+        echo "未运行" > "$file"
+    fi
+}
+
 # 更新模块描述
 update() {
     # 获取当前任务列表
@@ -42,7 +53,9 @@ update() {
         mv "$MODDIR/module.prop.new" "$MODDIR/module.prop"
     fi
 
-    pgrep -f crond 2>/dev/null || echo "未运行" > "$MODDIR/webroot/crond_pid" && pgrep -f unicrond 2>/dev/null || echo "未运行" > "$MODDIR/webroot/unicrond_pid"
+    update_pid_status "crond" "$MODDIR/webroot/crond_pid"
+    update_pid_status "unicrond" "$MODDIR/webroot/unicrond_pid"
+    
 }
 
 # 主要执行流程

@@ -1,2 +1,6 @@
 #!/system/bin/sh
-exec busybox crond "$@"
+if pgrep -f "unicrond" >/dev/null; then
+    echo "unicrond 已经在运行"
+    exit 1
+fi
+exec -a unicrond busybox crond "$@"

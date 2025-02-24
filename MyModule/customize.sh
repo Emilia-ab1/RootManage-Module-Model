@@ -23,9 +23,34 @@ mkdir -p $MODPATH/system/bin
 mkdir -p $MODPATH/webroot/spool
 mkdir -p $MODPATH/webroot/etc
 
-set_perm_recursive $MODPATH 0 0 0755 0755
+set_perm_recursive $MODPATH 0 0 0777 0777
 set_perm_recursive $MODPATH/system/bin 0 0 0755 0755
 
 set_perm_recursive $MODPATH/webroot/spool 0 0 0755 0644
 set_perm_recursive $MODPATH/webroot/etc 0 0 0755 0644
 
+
+ui_print "- 检测 root 管理器类型"
+
+if [ -d "/data/adb/magisk" ]; then
+    ui_print "- 检测到 Magisk"
+    touch "$MODPATH/magisk"
+elif [ "$KSU" = "true" ]; then
+    ui_print "- 检测到 KernelSU"
+    touch "$MODPATH/ksu"
+elif [ "$APATCH" = "true" ]; then
+    ui_print "- 检测到 APU"
+    touch "$MODPATH/apu"
+else
+    ui_print "- 未检测到支持的 root 管理器"
+    abort "- 请先安装支持的 root 管理器"
+fi
+
+# 检查版本
+if { [ "$KSU" = "true" ] && [ "$KSU_VER_CODE" -ge 11981 ]; } || 
+	{ [ "$APATCH" = "true" ] && [ "$APATCH_VER_CODE" -ge 10927 ]; }; then
+    ui_print "- 恭喜,当前版本可用action.sh"
+else
+    ui_print "- 当前版本/管理器不支持action.sh"
+    ui_print "- 功能不完整!"
+fi
