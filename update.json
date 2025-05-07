@@ -1,7 +1,7 @@
 {
-  "version": "debug",
-  "versionCode": "20250207",
-  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/debug/MagicNet-debug-20250207-byLIghtJUNction.zip",
-  "changelog": "https://github.com/LIghtJUNction/RootManage-Module-Model/MagicNet/CHANGELOG.md",
+  "version": "1.0.0.250507_release",
+  "versionCode": "2025050701",
+  "zipUrl": "https://github.com/LIghtJUNction/RootManage-Module-Model/releases/download/1.0.0.250507_release/MagicNet-1.0.0.250507_release-2025050701-byLIghtJUNction.zip",
+  "changelog": "https://github.com/LIghtJUNction/RootManage-Module-Model/raw/MagicNet/CHANGELOG.md",
   "description": "mihomo内核_ksu模块"
 }
